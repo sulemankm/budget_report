@@ -44,9 +44,18 @@ class BudggetReport:
 
         for budget_account in self.budgetReportItems:
             bri = self.budgetReportItems[budget_account]
-            str_expense = "{:<8}({:<5})".format(bri.expense, round(100 * bri.expense / bri.budget, 1))
+            if bri.budget == 0:
+                str_expense = "{:<8}({:<5})".format(bri.expense, ' ')
+            else:
+                str_expense = "{:<8}({:<5})".format(
+                    bri.expense, round(100 * bri.expense / bri.budget, 1))
+
             remaining = bri.budget - bri.expense
-            str_remaining = "{:<8}({:<5})".format(remaining, round(100 * remaining / bri.budget, 1))
+            if bri.budget == 0:
+                str_remaining = "{:<8}({:<5})".format(remaining, ' ')
+            else:
+                str_remaining="{:<8}({:<5})".format(
+                    remaining, round(100 * remaining / bri.budget, 1))
             print("{:<30} {:<8} {:<17} {:<17}".format(bri.account, bri.budget, str_expense, str_remaining))
 
         # Print totals

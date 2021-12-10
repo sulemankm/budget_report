@@ -22,7 +22,6 @@ option "insert_pythonpath" "True"
 1970-01-01 open Expenses:MessBill  RS
 1970-01-01 open Expenses:PocketMoney  RS
 1970-01-01 open Expenses:Sports RS
-1970-01-01 open Income:BatmanPay  RS
 1970-01-01 open Income:Salary  RS
 
 ;============================================================
@@ -34,10 +33,11 @@ option "insert_pythonpath" "True"
 ;      <Date> custom "budget" <Account>  <Amount> <Currency>
 ;============================================================
 2021-12-06 custom "budget" Liabilities:CreditCard   10000 RS
-2021-12-06 custom "budget" Expenses:Car:Fuel         5000 RS
+2021-12-06 custom "budget" Expenses:Car:Fuel       5000.0 RS
 2021-12-06 custom "budget" Expenses:Clothing        10000 RS
 2021-12-06 custom "budget" Expenses:Education:Fees  11000 RS
 2021-12-06 custom "budget" Expenses:Food:DiningOut  10000 RS
+2021-12-06 custom "budget" Expenses:Gardening         0.0 RS
 2021-12-06 custom "budget" Expenses:Groceries       50000 RS
 2021-12-06 custom "budget" Expenses:Medicine         2000 RS
 2021-12-06 custom "budget" Expenses:PocketMoney     10000 RS
@@ -76,3 +76,7 @@ option "insert_pythonpath" "True"
   Expenses:PocketMoney                       6000.0 RS
   Assets:CashInHand
     
+2021-12-08 * "Home Store" "Gardening Items"
+  Expenses:Gardening                         2000.0 RS
+  Assets:CashInHand
+  
