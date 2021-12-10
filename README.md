@@ -81,7 +81,7 @@ Tags can be used in your beancount ledger to specify transactions to include in 
 
 Later, you can specify the same tag at `budget-report` command line using `-t` or `--tag` option, while generating budget report.
 
-#### 3.2.2
+#### 3.2.2 Using start and end dates  
 
 Another way to tell `budget-report` which ledger entries to include in budget calculation, is to give it a start date (`-s` or `--start-date` command line option) and/or an end date (`-e` or `--end-date` command line option).  `budget-report` will include all transactions in the ledger falling at or after the given start date and at or before the given end date.
 
@@ -94,6 +94,21 @@ After you have added the budget entries in your beancount file, you can generate
 `$ budget-report -t Budget-Dec21 /path/to/your/beancount_file.bean`, or  
 
 `$ budget-report -s 2021-12-01 -e 2021-12-31 /path/to/your/beancount_file.bean`  
+
+It would generate output similar to that shown below:
+
+    Budget Account                 Budget   Expense (%)       Remaining (%)
+    ------------------------------ -------  ----------------  ----------------
+    Liabilities:CreditCard         10000    5000    (50.0 )   5000    (50.0 )  
+    Expenses:Car:Fuel              5000     1000    (20.0 )   4000    (80.0 )
+    Expenses:Clothing              10000    5000    (50.0 )   5000    (50.0 )
+    Expenses:Education:Fees        11000    5000    (45.5 )   6000    (54.5 )
+    Expenses:Food:DiningOut        10000    3000    (30.0 )   7000    (70.0 )
+    Expenses:Groceries             50000    10800   (21.6 )   39200   (78.4 )
+    Expenses:Medicine              2000     1000    (50.0 )   1000    (50.0 )
+    Expenses:PocketMoney           10000    6000    (60.0 )   4000    (40.0 )
+    ------------------------------ -------  ----------------  ----------------
+                                   108000   26800   (24.8 )   81200   (75.2 )
 
 Notes:  
 
