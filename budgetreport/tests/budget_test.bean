@@ -1,0 +1,78 @@
+; -*- mode: org; mode: beancount -*-
+option "insert_pythonpath" "True"
+;plugin "bean_budget"
+
+;============================================================
+; * Accounts ; Open all the accounts
+
+1970-01-01 open Assets:CheckingAccount  RS
+1970-01-01 open Assets:CashInHand  RS
+1970-01-01 open Liabilities:LoansPayable
+1970-01-01 open Liabilities:CreditCard
+1970-01-01 open Equity:OpeningBalances  RS
+1970-01-01 open Expenses:BankCharges  RS
+1970-01-01 open Expenses:Car:Fuel  RS
+1970-01-01 open Expenses:Charity  RS
+1970-01-01 open Expenses:Clothing  RS
+1970-01-01 open Expenses:Education:Fees  RS
+1970-01-01 open Expenses:Food:DiningOut  RS
+1970-01-01 open Expenses:Gardening  RS
+1970-01-01 open Expenses:Groceries  RS
+1970-01-01 open Expenses:Medicine  RS
+1970-01-01 open Expenses:MessBill  RS
+1970-01-01 open Expenses:PocketMoney  RS
+1970-01-01 open Expenses:Sports RS
+1970-01-01 open Income:BatmanPay  RS
+1970-01-01 open Income:Salary  RS
+
+;============================================================
+; Define a budget
+; Assumptions:
+;   a. All budgets are monthly budgets
+;   b. Budgets entries overried any previous entries
+;   c. Format of budget entry is as below:
+;      <Date> custom "budget" <Account>  <Amount> <Currency>
+;============================================================
+2021-12-06 custom "budget" Liabilities:CreditCard   10000 RS
+2021-12-06 custom "budget" Expenses:Car:Fuel         5000 RS
+2021-12-06 custom "budget" Expenses:Clothing        10000 RS
+2021-12-06 custom "budget" Expenses:Education:Fees  11000 RS
+2021-12-06 custom "budget" Expenses:Food:DiningOut  10000 RS
+2021-12-06 custom "budget" Expenses:Groceries       50000 RS
+2021-12-06 custom "budget" Expenses:Medicine         2000 RS
+2021-12-06 custom "budget" Expenses:PocketMoney     10000 RS
+
+;============================================================
+; Test transactions
+2021-12-01 * "Market" "Grocery items"
+  Expenses:Groceries                             800 RS
+  Assets:CashInHand
+
+2021-12-01 * "Wife" "For groceries"
+  Expenses:Groceries                        10000.0 RS
+  Assets:CashInHand
+  
+2021-12-02 * "Gas Station" "Fuel"
+  Expenses:Car:Fuel                          1000.0 RS
+  Assets:CashInHand
+  
+2021-12-03 * "Mall" "Clothes etc"
+  Expenses:Clothing                          5000.0 RS
+  Assets:CashInHand
+
+2021-12-04 * "Hotel" "Dinner"
+  Expenses:Food:DiningOut                    3000.0 RS
+  Assets:CheckingAccount
+  
+2021-12-05 * "Bank" "School Fees"
+  Expenses:Education:Fees                    5000.0 RS
+  Liabilities:CreditCard
+
+2021-12-06 * "Pharmacy" "Medicine"
+  Expenses:Medicine                          1000.0 RS
+  Assets:CashInHand
+
+2021-12-07 * "Kdis" "Pocket Money"
+  Expenses:PocketMoney                       6000.0 RS
+  Assets:CashInHand
+    
