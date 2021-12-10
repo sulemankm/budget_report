@@ -79,7 +79,7 @@ def generateBudgetReport(entries, options_map, args):
         rtypes, rrows = query.run_query(entries, options_map, sql_query, '', numberify=True)
         if len(rrows) != 0:
             account = rrows[0][0]
-            amount = rrows[0][1]
+            amount = abs(rrows[0][1])
             br.addBudgetExpense(account, amount)
             #be = __theBudgetReport[account]
             #be.expense = amount
