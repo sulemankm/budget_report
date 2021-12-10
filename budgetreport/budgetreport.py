@@ -86,39 +86,7 @@ def generateBudgetReport(entries, options_map, args):
 
     return br
 
-
-# def printBudgetReport1():
-#     print("\n")
-#     print("{:<30} {:<8} {:<17} {:<17}".format("Budget Account", "Budget", "Expense (%)", "Remaining (%)"))
-#     print("{:<30} {:<8} {:<17} {:<17}".format("------------------------------", "-------", "----------------", "----------------"))
-
-#     budget_total = 0
-#     expense_total = 0
-#     remaining_total = 0
-
-#     for budget_account in __theBudgetReport:
-#         bri = __theBudgetReport[budget_account]
-#         budget = abs(bri.amount.number)
-#         str_expense = "{:<8f}({:<5})".format(bri.expense, round(100 * bri.expense / budget, 1))
-#         remaining = budget - bri.expense
-#         str_remaining = "{:<8f}({:<5})".format(remaining, round(100 * remaining / budget, 1))
-#         print("{:<30} {:<8} {:<17} {:<17}".format(bri.account, budget, str_expense, str_remaining))
-#         # Compute totals
-#         budget_total += budget
-#         expense_total += bri.expense
-#         remaining_total += remaining
-
-#     # Print totals
-#     print("{:<30} {:<8} {:<17} {:<17}".format("------------------------------", "-------", "----------------", "----------------"))
-#     str_expense_total = "{:<8f}({:<5})".format(expense_total, round(100 * expense_total / budget_total, 1))
-#     str_remaining_total = "{:<8f}({:<5})".format(remaining_total, round(100 * remaining_total / budget_total, 1))
-#     print("{:<30} {:<8} {:<17} {:<17}".format(" ", budget_total, str_expense_total, str_remaining_total))
-
-# Print budget report using tabulate
-# def printBudgetReport2():
-#     pass
-
-
+# ========================================================================
 import argparse
 import pkg_resources  # part of setuptools
 
