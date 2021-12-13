@@ -12,10 +12,21 @@ class BudgetReportItem:
         self.date = date
         self.account = account
         self.budget = budget
-        self.expense = 0
+        self.expense = 0.0
 
     def __str__(self):
         return self.account
+
+    def getRemaining(self):
+        return self.budget - self.expense
+
+    def getPercentExpense(self):
+        if self.budget:
+            return 100 * self.expense / self.budget
+
+    def getPercentRemaining(self):
+        if self.budget:
+            return 100 * self.getRemaining() / self.budget
 
 class BudggetReport:
     def __init__(self) -> None:
@@ -26,13 +37,32 @@ class BudggetReport:
 
     def addBudget(self, date, account, budget):
         be = BudgetReportItem(date, account, budget)
+        if account in self.budgetReportItems:
+            self.total_budget -= self.budgetReportItems[account].budget
+            self.total_remaining -= self.budgetReportItems[account].budget
+
         self.total_budget += budget
+        self.total_remaining += budget
         self.budgetReportItems[account] = be
 
     def addBudgetExpense(self, account, expense):
         self.total_expenses += expense
         self.total_remaining = self.total_budget - self.total_expenses
         self.budgetReportItems[account].expense = expense
+
+    def getBudget(self, account):
+        return self.budgetReportItems[account].budget
+
+    def getExpense(self, account):
+        return self.budgetReportItems[account].expense
+
+    def getPercentExpenses(self):
+        if not self.total_budget == 0:
+            return 100 * self.total_expenses / self.total_budget
+
+    def getPercentRemaining(self):
+        if not self.total_expenses == 0:
+            return 100 * self.total_remaining / self.total_budget
 
     def getBudgetReportItems(self):
         return self.budgetReportItems
@@ -60,8 +90,8 @@ class BudggetReport:
 
         # Print totals
         print("{:<30} {:<8} {:<17} {:<17}".format("------------------------------", "-------", "----------------", "----------------"))
-        str_expense_total = "{:<8}({:<5})".format(self.total_expenses, round(100 * self.total_expenses / self.total_budget, 1))
-        str_remaining_total = "{:<8}({:<5})".format(self.total_remaining, round(100 * self.total_remaining / self.total_budget, 1))
+        str_expense_total = "{:<8}({:<5})".format(self.total_expenses, round(self.getPercentExpenses(), 1))
+        str_remaining_total = "{:<8}({:<5})".format(self.total_remaining, round(self.getPercentRemaining(), 1))
         print("{:<30} {:<8} {:<17} {:<17}".format(" ", self.total_budget, str_expense_total, str_remaining_total))
 
 # getBudgetReport : entries, options_map -> { account: BudgetReportItem }
@@ -70,7 +100,7 @@ def generateBudgetReport(entries, options_map, args):
 
     for entry in entries:
         if isinstance(entry, beancount.core.data.Custom) and entry.type == 'budget':
-            #be = BudgetReportItem(entry.date, str(entry.values[0].value), abs(entry.values[1].value.number))
+            #print(entry)
             br.addBudget(entry.date, str(entry.values[0].value), abs(entry.values[1].value.number))
 
     # Get actual expenses for all budget accounts
@@ -90,8 +120,6 @@ def generateBudgetReport(entries, options_map, args):
             account = rrows[0][0]
             amount = abs(rrows[0][1])
             br.addBudgetExpense(account, amount)
-            #be = __theBudgetReport[account]
-            #be.expense = amount
 
     return br
 
@@ -99,7 +127,7 @@ def generateBudgetReport(entries, options_map, args):
 import argparse
 import pkg_resources  # part of setuptools
 
-def script_main():
+def init_arg_parser():
     parser = argparse.ArgumentParser(description="Budget report for beancount files")
     parser.add_argument("-v", "--version", action="version", help="Print version number and exit",
         version='%(prog)s {}'.format(pkg_resources.require("budget_report")[0].version))
@@ -107,6 +135,10 @@ def script_main():
     parser.add_argument("-s", "--start-date", help="Budget start date")
     parser.add_argument("-e", "--end-date", help="Budget end date")
     parser.add_argument("filename", help="Name of beancount file to process")
+    return parser
+
+def script_main():
+    parser = init_arg_parser()
     args = parser.parse_args()
 
     entries, errors, options_map = loader.load_file(args.filename)
