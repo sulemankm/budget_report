@@ -23,9 +23,9 @@ def testSingleAccountBudget(monkeypatch):
       br = budgetreport.generateBudgetReport(entries, options_map, test_args)
       assert br.total_budget == 1000.0
       assert br.total_expenses == 400.0
-      assert br.total_remaining == 600.0
-      assert br.getBudget('Expense:Groceries') == 1000.0
-      assert br.getExpense('Expense:Groceries') == 400.0
+      assert br.getTotalRemaining() == 600.0
+      assert br.getAccountBudget('Expense:Groceries') == 1000.0
+      assert br.getAccountExpense('Expense:Groceries') == 400.0
 
 def testBudgetWithZeroValue(monkeypatch):
     entries, errors, options_map = loader.load_string("""
@@ -48,9 +48,9 @@ def testBudgetWithZeroValue(monkeypatch):
       br = budgetreport.generateBudgetReport(entries, options_map, test_args)
       assert br.total_budget == 0.0
       assert br.total_expenses == 400.0
-      assert br.total_remaining == -400.0
-      assert br.getBudget('Expense:Groceries') == 0.0
-      assert br.getExpense('Expense:Groceries') == 400.0
+      assert br.getTotalRemaining() == -400.0
+      assert br.getAccountBudget('Expense:Groceries') == 0.0
+      assert br.getAccountExpense('Expense:Groceries') == 400.0
 
 def testTaggedBugget(monkeypatch):
     entries, errors, options_map = loader.load_string("""
@@ -82,9 +82,9 @@ def testTaggedBugget(monkeypatch):
       br = budgetreport.generateBudgetReport(entries, options_map, test_args)
       assert br.total_budget == 1000.0
       assert br.total_expenses == 400.0
-      assert br.total_remaining == 600.0
-      assert br.getBudget('Expense:Groceries') == 1000.0
-      assert br.getExpense('Expense:Groceries') == 400.0
+      assert br.getTotalRemaining() == 600.0
+      assert br.getAccountBudget('Expense:Groceries') == 1000.0
+      assert br.getAccountExpense('Expense:Groceries') == 400.0
 
 def testBuggetWithStartAndEndDate(monkeypatch):
     entries, errors, options_map = loader.load_string("""
@@ -124,9 +124,9 @@ def testBuggetWithStartAndEndDate(monkeypatch):
       br = budgetreport.generateBudgetReport(entries, options_map, test_args)
       assert br.total_budget == 1000.0
       assert br.total_expenses == 700.0
-      assert br.total_remaining == 300.0
-      assert br.getBudget('Expense:Groceries') == 1000.0
-      assert br.getExpense('Expense:Groceries') == 700.0
+      assert br.getTotalRemaining() == 300.0
+      assert br.getAccountBudget('Expense:Groceries') == 1000.0
+      assert br.getAccountExpense('Expense:Groceries') == 700.0
 
 
 def testMultipleAccountBudgets(monkeypatch):
@@ -156,11 +156,11 @@ def testMultipleAccountBudgets(monkeypatch):
       br = budgetreport.generateBudgetReport(entries, options_map, test_args)
       assert br.total_budget == 3000.0
       assert br.total_expenses == 1500.0
-      assert br.total_remaining == 1500.0
-      assert br.getBudget('Expense:Education') == 2000.0
-      assert br.getExpense('Expense:Education') == 1200.0
-      assert br.getBudget('Expense:Clothing') == 1000.0
-      assert br.getExpense('Expense:Clothing') == 300.0
+      assert br.getTotalRemaining() == 1500.0
+      assert br.getAccountBudget('Expense:Education') == 2000.0
+      assert br.getAccountExpense('Expense:Education') == 1200.0
+      assert br.getAccountBudget('Expense:Clothing') == 1000.0
+      assert br.getAccountExpense('Expense:Clothing') == 300.0
 
 
 def testBudgetRedefinitionOverridesOldValue(monkeypatch):
@@ -183,6 +183,6 @@ def testBudgetRedefinitionOverridesOldValue(monkeypatch):
       br = budgetreport.generateBudgetReport(entries, options_map, test_args)
       assert br.total_budget == 2000.0
       assert br.total_expenses == 0.0
-      assert br.total_remaining == 2000.0
-      assert br.getBudget('Expense:Clothing') == 2000.0
-      assert br.getExpense('Expense:Clothing') == 0.0
+      assert br.getTotalRemaining() == 2000.0
+      assert br.getAccountBudget('Expense:Clothing') == 2000.0
+      assert br.getAccountExpense('Expense:Clothing') == 0.0

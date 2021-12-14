@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-# main.py
+
 import re
 import beancount
 from beancount import loader
 from beancount.query import query
 from tabulate import tabulate
-#import budget_report
+
 
 class BudgetReportItem:
     def __init__(self, date, account, budget):
@@ -33,36 +33,35 @@ class BudggetReport:
         self.budgetReportItems = {} # An dict to store budget report items
         self.total_budget = 0
         self.total_expenses = 0
-        self.total_remaining = 0
 
     def addBudget(self, date, account, budget):
         be = BudgetReportItem(date, account, budget)
         if account in self.budgetReportItems:
             self.total_budget -= self.budgetReportItems[account].budget
-            self.total_remaining -= self.budgetReportItems[account].budget
 
         self.total_budget += budget
-        self.total_remaining += budget
         self.budgetReportItems[account] = be
 
     def addBudgetExpense(self, account, expense):
         self.total_expenses += expense
-        self.total_remaining = self.total_budget - self.total_expenses
         self.budgetReportItems[account].expense = expense
 
-    def getBudget(self, account):
+    def getAccountBudget(self, account):
         return self.budgetReportItems[account].budget
 
-    def getExpense(self, account):
+    def getAccountExpense(self, account):
         return self.budgetReportItems[account].expense
+
+    def getTotalRemaining(self):
+        return self.total_budget - self.total_expenses
 
     def getPercentExpenses(self):
         if not self.total_budget == 0:
             return 100 * self.total_expenses / self.total_budget
 
     def getPercentRemaining(self):
-        if not self.total_expenses == 0:
-            return 100 * self.total_remaining / self.total_budget
+        if not self.total_budget == 0:
+            return 100 * self.getTotalRemaining() / self.total_budget
 
     def getBudgetReportItems(self):
         return self.budgetReportItems
@@ -78,20 +77,20 @@ class BudggetReport:
                 str_expense = "{:<8}({:<5})".format(bri.expense, ' ')
             else:
                 str_expense = "{:<8}({:<5})".format(
-                    bri.expense, round(100 * bri.expense / bri.budget, 1))
+                    bri.expense, round(bri.getPercentExpense(), 1))
 
-            remaining = bri.budget - bri.expense
             if bri.budget == 0:
-                str_remaining = "{:<8}({:<5})".format(remaining, ' ')
+                str_remaining = "{:<8}({:<5})".format(bri.getRemaining(), ' ')
             else:
                 str_remaining="{:<8}({:<5})".format(
-                    remaining, round(100 * remaining / bri.budget, 1))
+                    bri.getRemaining(), round(bri.getPercentRemaining(), 1))
             print("{:<30} {:<8} {:<17} {:<17}".format(bri.account, bri.budget, str_expense, str_remaining))
 
         # Print totals
         print("{:<30} {:<8} {:<17} {:<17}".format("------------------------------", "-------", "----------------", "----------------"))
         str_expense_total = "{:<8}({:<5})".format(self.total_expenses, round(self.getPercentExpenses(), 1))
-        str_remaining_total = "{:<8}({:<5})".format(self.total_remaining, round(self.getPercentRemaining(), 1))
+        str_remaining_total = "{:<8}({:<5})".format(
+            self.getTotalRemaining(), round(self.getPercentRemaining(), 1))
         print("{:<30} {:<8} {:<17} {:<17}".format(" ", self.total_budget, str_expense_total, str_remaining_total))
 
 # getBudgetReport : entries, options_map -> { account: BudgetReportItem }
@@ -100,7 +99,6 @@ def generateBudgetReport(entries, options_map, args):
 
     for entry in entries:
         if isinstance(entry, beancount.core.data.Custom) and entry.type == 'budget':
-            #print(entry)
             br.addBudget(entry.date, str(entry.values[0].value), abs(entry.values[1].value.number))
 
     # Get actual expenses for all budget accounts
