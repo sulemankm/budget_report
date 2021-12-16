@@ -89,39 +89,6 @@ class BudggetReport:
         budget_data = self.toList()
         print(tabulate(budget_data, headings, numalign="right", floatfmt=".1f"))
 
-    def printReport2(self):
-        print("\n")
-        print("{:<30} {:<8} {:<17} {:<17}".format(
-            "Budget Account", "Budget", "Expense (%)", "Remaining (%)"))
-        print("{:<30} {:<8} {:<17} {:<17}".format(
-            "------------------------------", "-------", "----------------", "----------------"))
-
-        for budget_account in self.budgetReportItems:
-            bri = self.budgetReportItems[budget_account]
-            if bri.budget == 0:
-                str_expense = "{:<8}({:<5})".format(bri.expense, ' ')
-            else:
-                str_expense = "{:<8}({:<5})".format(
-                    bri.expense, round(bri.getPercentExpense(), 1))
-
-            if bri.budget == 0:
-                str_remaining = "{:<8}({:<5})".format(bri.getRemaining(), ' ')
-            else:
-                str_remaining = "{:<8}({:<5})".format(
-                    bri.getRemaining(), round(bri.getPercentRemaining(), 1))
-            print("{:<30} {:<8} {:<17} {:<17}".format(
-                bri.account, bri.budget, str_expense, str_remaining))
-
-        # Print totals
-        print("{:<30} {:<8} {:<17} {:<17}".format(
-            "------------------------------", "-------", "----------------", "----------------"))
-        str_expense_total = "{:<8}({:<5})".format(
-            self.total_expenses, round(self.getPercentExpenses(), 1))
-        str_remaining_total = "{:<8}({:<5})".format(
-            self.getTotalRemaining(), round(self.getPercentRemaining(), 1))
-        print("{:<30} {:<8} {:<17} {:<17}".format(
-            " ", self.total_budget, str_expense_total, str_remaining_total))
-
 # getBudgetReport : entries, options_map -> { account: BudgetReportItem }
 def generateBudgetReport(entries, options_map, args):
     br = BudggetReport()
