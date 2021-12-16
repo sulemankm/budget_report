@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import re
 import beancount
 from beancount import loader
 from beancount.query import query
@@ -47,8 +46,10 @@ class BudggetReport:
         self.total_budget += float(budget)
         self.budgetReportItems[account] = be
 
-    def addBudgetExpense(self, account, expense):
+    def addBudgetExpense(self, date, account, expense):
         self.total_expenses += float(expense)
+        if not account in self.budgetReportItems: # if budget exists
+            self.addBudget(date, account, 0.0)
         self.budgetReportItems[account].expense = float(expense)
 
     def getAccountBudget(self, account):
@@ -130,8 +131,9 @@ def generateBudgetReport(entries, options_map, args):
             br.addBudget(entry.date, str(entry.values[0].value), abs(entry.values[1].value.number))
 
     # Get actual expenses for all budget accounts
-    for budget_account in br.getBudgetReportItems():
-        sql_query = "select account, SUM(position) AS amount WHERE account ~ '{}'".format(budget_account)
+    br_items = {**br.getBudgetReportItems()}
+    for budget_account in br_items:
+        sql_query = "select date, account, SUM(position) AS amount WHERE account ~ '{}'".format(budget_account)
         if args.tag:
             sql_query += " and '{}' in tags".format(args.tag)
 
@@ -143,9 +145,10 @@ def generateBudgetReport(entries, options_map, args):
 
         rtypes, rrows = query.run_query(entries, options_map, sql_query, '', numberify=True)
         if len(rrows) != 0:
-            account = rrows[0][0]
-            amount = abs(rrows[0][1])
-            br.addBudgetExpense(account, amount)
+            date = rrows[0][0]
+            account = rrows[0][1]
+            amount = abs(rrows[0][2])
+            br.addBudgetExpense(date, account, amount)
 
     return br
 
