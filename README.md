@@ -22,10 +22,10 @@ or
 
 ## 3. How-To Use
 
-Using `budget_report` with your beancount files is a two step process:  
+Using `budget_report` with your beancount files is a three step process:  
 
 1. Specify your budget in the beancount files,  
-2. Specifying the transactions to include in a particular budger and  
+2. Specifying the transactions to include in a particular budget and  
 3. Generate budget report using `budget-report` script provided by this package.
 
 
@@ -65,11 +65,11 @@ b. The budget entries could also be put into a separate file such as `mybudget.b
 There are two ways you can tell `budget-report` which transactions to include while computing budget report:  
 
 a. Using budget name tags in your beancount ledger, and specifying the same tag at `budget-report` command line, or   
-b. Giving start date as command line argument.   
+b. Giving start and/or end date(s) as command line argument.   
 
 #### 3.2.1  Using Budget Tags
 
-Tags can be used in your beancount ledger to specify transactions to include in a particular budget report.  The easiest way to use beancount `pushtag` and `poptag` directive as below.  However, individullay tagging each transaction with a tag should also work.
+Tags can be used in your beancount ledger to specify transactions to include in a particular budget report.  The easiest way is to use beancount `pushtag` and `poptag` directive as below.  However, individullay tagging each transaction with a tag should also work.
 
     pushtag #Budget-Dec21 ; or any tag you want to use to name your budget!
     
@@ -114,7 +114,7 @@ It would generate output similar to that shown below:
 
 Notes:  
 
-a. If end data is omitted, all entries in the ledger at/after the start date would be included in the computation.  
+a. If end date is omitted, all entries in the ledger at/after the start date would be included in the computation.  
 b. If start date is omitted, and only end date is given, all entries at/before the end date would be included.  
 c. If both tag and start/end dates are given, bothe will be used to filter the entries in the ledger.
 
