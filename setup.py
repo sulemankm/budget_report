@@ -5,7 +5,7 @@ def readme():
         return f.read()
     
 setup(name='budget_report',
-      version='0.1',
+      version='0.2',
       description='Budget report for beancount files',
       long_description=readme(),
       long_description_content_type="text/markdown",
