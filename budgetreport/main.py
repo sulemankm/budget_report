@@ -2,7 +2,7 @@
 
 import argparse
 import pkg_resources  # part of setuptools
-from budgetreport import budgetreport
+from budgetreport import report
 from beancount import loader
 
 def init_arg_parser():
@@ -24,7 +24,7 @@ def script_main():
         print(errors)
         #assert False
 
-    br = budgetreport.generateBudgetReport(entries, options_map, args)
+    br = report.generateBudgetReport(entries, options_map, args)
     br.printReport()
 
 if __name__ == "__main__":

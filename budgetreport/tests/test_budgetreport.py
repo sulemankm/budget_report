@@ -1,5 +1,5 @@
 import sys
-from budgetreport import budgetreport, main
+from budgetreport import report, main
 from beancount import loader
 
 def testSingleAccountBudget(monkeypatch):
@@ -20,7 +20,7 @@ def testSingleAccountBudget(monkeypatch):
       parser = main.init_arg_parser()
       test_args = parser.parse_args()
 
-      br = budgetreport.generateBudgetReport(entries, options_map, test_args)
+      br = report.generateBudgetReport(entries, options_map, test_args)
       assert br.total_budget == 1000.0
       assert br.total_expenses == 400.0
       assert br.getTotalRemaining() == 600.0
@@ -45,7 +45,7 @@ def testBudgetWithZeroValue(monkeypatch):
       parser = main.init_arg_parser()
       test_args = parser.parse_args()
 
-      br = budgetreport.generateBudgetReport(entries, options_map, test_args)
+      br = report.generateBudgetReport(entries, options_map, test_args)
       assert br.total_budget == 0.0
       assert br.total_expenses == 400.0
       assert br.getTotalRemaining() == -400.0
@@ -83,7 +83,7 @@ def testTaggedBugget(monkeypatch):
       parser = main.init_arg_parser()
       test_args = parser.parse_args()
 
-      br = budgetreport.generateBudgetReport(entries, options_map, test_args)
+      br = report.generateBudgetReport(entries, options_map, test_args)
       assert br.total_budget == 1000.0
       assert br.total_expenses == 600.0
       assert br.getTotalRemaining() == 400.0
@@ -125,7 +125,7 @@ def testBuggetWithStartAndEndDate(monkeypatch):
       parser = main.init_arg_parser()
       test_args = parser.parse_args()
 
-      br = budgetreport.generateBudgetReport(entries, options_map, test_args)
+      br = report.generateBudgetReport(entries, options_map, test_args)
       assert br.total_budget == 1000.0
       assert br.total_expenses == 900.0
       assert br.getTotalRemaining() == 100.0
@@ -157,7 +157,7 @@ def testMultipleAccountBudgets(monkeypatch):
       parser = main.init_arg_parser()
       test_args = parser.parse_args()
 
-      br = budgetreport.generateBudgetReport(entries, options_map, test_args)
+      br = report.generateBudgetReport(entries, options_map, test_args)
       assert br.total_budget == 3000.0
       assert br.total_expenses == 1500.0
       assert br.getTotalRemaining() == 1500.0
@@ -184,7 +184,7 @@ def testBudgetRedefinitionOverridesOldValue(monkeypatch):
       parser = main.init_arg_parser()
       test_args = parser.parse_args()
 
-      br = budgetreport.generateBudgetReport(entries, options_map, test_args)
+      br = report.generateBudgetReport(entries, options_map, test_args)
       assert br.total_budget == 2000.0
       assert br.total_expenses == 0.0
       assert br.getTotalRemaining() == 2000.0
