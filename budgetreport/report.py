@@ -100,7 +100,7 @@ def collectBudgetAccounts(entries, options_map, args, br):
                 entry.values[1].value.number))
    
     # Collect expense accounts not budgetted but have expenses
-    acct_query = "select account WHERE account ~ 'Expenses' "
+    acct_query = "select account WHERE account ~ 'Expense' "
     if args.tag:
         acct_query += "and '{}' in tags".format(args.tag)
 
