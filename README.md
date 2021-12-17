@@ -2,7 +2,7 @@
 
 ## 1. Introcudtion
 
-If you use the text-based ledger system ie `beancount`, and feel the need for a tools to track your expenses against your budget, then this tool may be what you need.
+If you use the text-based ledger system ie [beancount](https://github.com/beancount/beancount), and feel the need for a tools to track your expenses against your budget, then this tool may be what you need.
 
 `budget_report` is a simple tool to read beancount ledger files as input and generate simple budget report based on the budget entries within the input beancount file. 
 
@@ -81,6 +81,8 @@ Tags can be used in your beancount ledger to specify transactions to include in 
 
 Later, you can specify the same tag at `budget-report` command line using `-t` or `--tag` option, while generating budget report.
 
+Note: If `budget-report` encounters a posting in the ledger with the budget tag, it is included into the bugetted postings regardless of the existence a corresponding `budget` directive.  If no corresponding `budget` directive entry is found, an entry for the posting account with zero budget value is automatically added for this purpose.  
+
 #### 3.2.2 Using start and end dates  
 
 Another way to tell `budget-report` which ledger entries to include in budget calculation, is to give it a start date (`-s` or `--start-date` command line option) and/or an end date (`-e` or `--end-date` command line option).  `budget-report` will include all transactions in the ledger falling at or after the given start date and at or before the given end date.
@@ -97,18 +99,18 @@ After you have added the budget entries in your beancount file, you can generate
 
 It would generate output similar to that shown below:
 
-    Budget Account                 Budget   Expense (%)       Remaining (%)
-    ------------------------------ -------  ----------------  ----------------
-    Liabilities:CreditCard         10000    5000    (50.0 )   5000    (50.0 )  
-    Expenses:Car:Fuel              5000     1000    (20.0 )   4000    (80.0 )
-    Expenses:Clothing              10000    5000    (50.0 )   5000    (50.0 )
-    Expenses:Education:Fees        11000    5000    (45.5 )   6000    (54.5 )
-    Expenses:Food:DiningOut        10000    3000    (30.0 )   7000    (70.0 )
-    Expenses:Groceries             50000    10800   (21.6 )   39200   (78.4 )
-    Expenses:Medicine              2000     1000    (50.0 )   1000    (50.0 )
-    Expenses:PocketMoney           10000    6000    (60.0 )   4000    (40.0 )
-    ------------------------------ -------  ----------------  ----------------
-                                   108000   36800   (34.1 )   71200   (65.9 )
+    Account                    Budget    Expense    (%)    Remaining    (%)
+    -----------------------  --------  ---------  -----  -----------  -----
+    Liabilities:CreditCard    10000.0     5000.0   50.0       5000.0   50.0
+    Expenses:Car:Fuel          5000.0     1000.0   20.0       4000.0   80.0
+    Expenses:Clothing         10000.0     5000.0   50.0       5000.0   50.0
+    Expenses:Education:Fees   11000.0     5000.0   45.5       6000.0   54.5
+    Expenses:Food:DiningOut   10000.0     3000.0   30.0       7000.0   70.0
+    Expenses:Gardening            0.0     2000.0             -2000.0
+    Expenses:Groceries        50000.0    10800.0   21.6      39200.0   78.4
+    Expenses:Medicine          2000.0     1000.0   50.0       1000.0   50.0
+    Expenses:PocketMoney      10000.0     6000.0   60.0       4000.0   40.0
+    Totals                   108000.0    38800.0   35.9      69200.0   64.1
 
 Notes:  
 
