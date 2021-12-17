@@ -26,6 +26,6 @@ setup(name='budget_report',
       tests_require=['pytest'],
 #      scripts=['bin/budget-report.py']
       entry_points={
-        'console_scripts': ['budget-report=budgetreport.budgetreport:script_main']
+        'console_scripts': ['budget-report=budgetreport.main:script_main']
       },
       zip_safe=False)
