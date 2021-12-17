@@ -1,5 +1,5 @@
 import sys
-from budgetreport import budgetreport
+from budgetreport import budgetreport, main
 from beancount import loader
 
 def testSingleAccountBudget(monkeypatch):
@@ -17,7 +17,7 @@ def testSingleAccountBudget(monkeypatch):
     with monkeypatch.context() as m:
       m.setattr(sys, "argv", ["prog", "testfile.bean"])
 
-      parser = budgetreport.init_arg_parser()
+      parser = main.init_arg_parser()
       test_args = parser.parse_args()
 
       br = budgetreport.generateBudgetReport(entries, options_map, test_args)
@@ -42,7 +42,7 @@ def testBudgetWithZeroValue(monkeypatch):
     with monkeypatch.context() as m:
       m.setattr(sys, "argv", ["prog", "testfile.bean"])
 
-      parser = budgetreport.init_arg_parser()
+      parser = main.init_arg_parser()
       test_args = parser.parse_args()
 
       br = budgetreport.generateBudgetReport(entries, options_map, test_args)
@@ -65,10 +65,14 @@ def testTaggedBugget(monkeypatch):
       Expense:Groceries                    400.0 USD
       Assets:CashInHand
 
+    2021-01-02 * "TestPayee" "Some description"
+      Expense:Groceries                    200.0 USD
+      Assets:CashInHand
+
     poptag #test-budget
 
     2021-01-03 * "Payee 2" "Some description"
-      Expense:Groceries                    200.0 USD
+      Expense:Groceries                    100.0 USD
       Assets:CashInHand
 
     """)
@@ -76,15 +80,15 @@ def testTaggedBugget(monkeypatch):
     with monkeypatch.context() as m:
       m.setattr(sys, "argv", ["prog", "-t" "test-budget", "testfile.bean"])
 
-      parser = budgetreport.init_arg_parser()
+      parser = main.init_arg_parser()
       test_args = parser.parse_args()
 
       br = budgetreport.generateBudgetReport(entries, options_map, test_args)
       assert br.total_budget == 1000.0
-      assert br.total_expenses == 400.0
-      assert br.getTotalRemaining() == 600.0
+      assert br.total_expenses == 600.0
+      assert br.getTotalRemaining() == 400.0
       assert br.getAccountBudget('Expense:Groceries') == 1000.0
-      assert br.getAccountExpense('Expense:Groceries') == 400.0
+      assert br.getAccountExpense('Expense:Groceries') == 600.0
 
 def testBuggetWithStartAndEndDate(monkeypatch):
     entries, errors, options_map = loader.load_string("""
@@ -94,23 +98,23 @@ def testBuggetWithStartAndEndDate(monkeypatch):
     2021-01-01 custom "budget" Expense:Groceries   1000.0 USD
 
     2020-12-31 * "TestPayee" "Some description"
-      Expense:Groceries                    400.0 USD
+      Expense:Groceries                    500.0 USD
       Assets:CashInHand
 
     2021-01-01 * "TestPayee" "Some description"
-      Expense:Groceries                    200.0 USD
-      Assets:CashInHand
-
-    2021-01-02 * "TestPayee" "Some description"
       Expense:Groceries                    400.0 USD
       Assets:CashInHand
 
+    2021-01-02 * "TestPayee" "Some description"
+      Expense:Groceries                    300.0 USD
+      Assets:CashInHand
+
     2021-01-10 * "TestPayee" "Some description"
-      Expense:Groceries                    100.0 USD
+      Expense:Groceries                    200.0 USD
       Assets:CashInHand
 
     2021-01-13 * "Payee 2" "Some description"
-      Expense:Groceries                    200.0 USD
+      Expense:Groceries                    100.0 USD
       Assets:CashInHand
 
     """)
@@ -118,15 +122,15 @@ def testBuggetWithStartAndEndDate(monkeypatch):
     with monkeypatch.context() as m:
       m.setattr(sys, "argv", ["prog", "-s" "2021-01-01", "-e", "2021-01-10", "testfile.bean"])
 
-      parser = budgetreport.init_arg_parser()
+      parser = main.init_arg_parser()
       test_args = parser.parse_args()
 
       br = budgetreport.generateBudgetReport(entries, options_map, test_args)
       assert br.total_budget == 1000.0
-      assert br.total_expenses == 700.0
-      assert br.getTotalRemaining() == 300.0
+      assert br.total_expenses == 900.0
+      assert br.getTotalRemaining() == 100.0
       assert br.getAccountBudget('Expense:Groceries') == 1000.0
-      assert br.getAccountExpense('Expense:Groceries') == 700.0
+      assert br.getAccountExpense('Expense:Groceries') == 900.0
 
 
 def testMultipleAccountBudgets(monkeypatch):
@@ -150,7 +154,7 @@ def testMultipleAccountBudgets(monkeypatch):
     with monkeypatch.context() as m:
       m.setattr(sys, "argv", ["prog", "testfile.bean"])
 
-      parser = budgetreport.init_arg_parser()
+      parser = main.init_arg_parser()
       test_args = parser.parse_args()
 
       br = budgetreport.generateBudgetReport(entries, options_map, test_args)
@@ -177,7 +181,7 @@ def testBudgetRedefinitionOverridesOldValue(monkeypatch):
     with monkeypatch.context() as m:
       m.setattr(sys, "argv", ["prog", "testfile.bean"])
 
-      parser = budgetreport.init_arg_parser()
+      parser = main.init_arg_parser()
       test_args = parser.parse_args()
 
       br = budgetreport.generateBudgetReport(entries, options_map, test_args)
