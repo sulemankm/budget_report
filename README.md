@@ -1,6 +1,6 @@
 # Budget Report for Beancount Ledgers
 
-## 1. Introcudtion
+## 1. Introduction
 
 If you use the text-based ledger system ie [beancount](https://github.com/beancount/beancount), and feel the need for a tools to track your expenses against your budget, then this tool may be what you need.
 
