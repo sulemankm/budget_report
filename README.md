@@ -16,10 +16,6 @@ or
 
 `pip install budget_report --user`, if you want to install for local user  
 
-or  
-
-`pip install --user --no-cache-dir`, if you get error during installation saying something like *`ERROR: Failed building wheel for budget-report`*.
-
 ## 3. How-To Use
 
 Using `budget_report` with your beancount files is a three step process:  
