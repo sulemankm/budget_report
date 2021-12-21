@@ -29,25 +29,26 @@ Using `budget-report` with your beancount files is a three step process:
 
 You specify your budget by entering a sequenct of beancount `custom` directives in the following format:  
 
-`<Date> custom "budget" <Account> <Amount> <Currency>`
+`<Date> custom "budget" <Account> <Period> <Amount> <Currency>`
 
 Where:  
 
 - **Date** is in the formate **YYYY-MM-DD**,   
 - **Account** is the name of the account you want to specify budget followed by 2 or more spaces,  
+- **Period** is the applicable period of the budget ie one of "year", "biannual", "month", "week" or "day"
 - **Amount** is a number specifying the budget amount allocated for this account,  
 - **Currency** is the currency in which budget is specified.  
 
 Here is an example budget:  
 
-    2021-12-06 custom "budget" Liabilities:CreditCard   10000 RS  
-    2021-12-06 custom "budget" Expenses:Car:Fuel         5000 RS  
-    2021-12-06 custom "budget" Expenses:Clothing        10000 RS  
-    2021-12-06 custom "budget" Expenses:Education:Fees  11000 RS  
-    2021-12-06 custom "budget" Expenses:Food:DiningOut   3000 RS  
-    2021-12-06 custom "budget" Expenses:Groceries       50000 RS   
-    2021-12-06 custom "budget" Expenses:Medicine         2000 RS     
-    2021-12-06 custom "budget" Expenses:PocketMoney     10000 RS  
+    2021-12-06 custom "budget" Liabilities:CreditCard "month"   10000 RS  
+    2021-12-06 custom "budget" Expenses:Car:Fuel "month"         5000 RS  
+    2021-12-06 custom "budget" Expenses:Clothing "month"        10000 RS  
+    2021-12-06 custom "budget" Expenses:Education:Fees "month"  11000 RS  
+    2021-12-06 custom "budget" Expenses:Food:DiningOut "month"   3000 RS  
+    2021-12-06 custom "budget" Expenses:Groceries "month"       50000 RS   
+    2021-12-06 custom "budget" Expenses:Medicine "month"         2000 RS     
+    2021-12-06 custom "budget" Expenses:PocketMoney "month"     10000 RS  
 
 Please note that:   
 
