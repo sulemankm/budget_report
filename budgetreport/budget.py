@@ -1,9 +1,10 @@
 # budget.py
 
 class BudgetItem:
-    def __init__(self, date, account, budget):
+    def __init__(self, date, account, period, budget):
         self.date = date
         self.account = account
+        self.period = period
         self.budget = float(budget)
         self.expense = 0.0
 
@@ -25,3 +26,4 @@ class BudgetItem:
         return [self.account, self.budget, self.expense,
                 self.getPercentExpense(), self.getRemaining(),
                 self.getPercentRemaining()]
+                

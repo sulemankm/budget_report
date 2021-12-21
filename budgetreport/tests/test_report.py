@@ -7,7 +7,7 @@ def testSingleAccountBudget(monkeypatch):
     2001-01-01 open Assets:CashInHand
     2001-01-01 open Expenses:Groceries
 
-    2021-01-01 custom "budget" Expenses:Groceries   1000.0 USD
+    2021-01-01 custom "budget" Expenses:Groceries "month"   1000.0 USD
 
     2021-01-02 * "TestPayee" "Some description"
       Expenses:Groceries                    400.0 USD
@@ -32,7 +32,7 @@ def testBudgetWithZeroValue(monkeypatch):
     2001-01-01 open Assets:CashInHand
     2001-01-01 open Expenses:Groceries
 
-    2021-01-01 custom "budget" Expenses:Groceries   0.0 USD
+    2021-01-01 custom "budget" Expenses:Groceries "month"   0.0 USD
 
     2021-01-02 * "TestPayee" "Some description"
       Expenses:Groceries                    400.0 USD
@@ -57,7 +57,7 @@ def testTaggedBugget(monkeypatch):
     2001-01-01 open Assets:CashInHand
     2001-01-01 open Expenses:Groceries
 
-    2021-01-01 custom "budget" Expenses:Groceries   1000.0 USD
+    2021-01-01 custom "budget" Expenses:Groceries "month"   1000.0 USD
 
     pushtag #test-budget
 
@@ -95,7 +95,7 @@ def testBuggetWithStartAndEndDate(monkeypatch):
     2001-01-01 open Assets:CashInHand
     2001-01-01 open Expenses:Groceries
 
-    2021-01-01 custom "budget" Expenses:Groceries   1000.0 USD
+    2021-01-01 custom "budget" Expenses:Groceries "month"   1000.0 USD
 
     2020-12-31 * "TestPayee" "Some description"
       Expenses:Groceries                    500.0 USD
@@ -139,8 +139,8 @@ def testMultipleAccountBudgets(monkeypatch):
 2001-01-01 open Expenses:Clothing
 2001-01-01 open Expenses:Education
 
-2021-01-01 custom "budget" Expenses:Clothing     1000.0 USD
-2021-01-01 custom "budget" Expenses:Education    2000.0 USD
+2021-01-01 custom "budget" Expenses:Clothing "month"     1000.0 USD
+2021-01-01 custom "budget" Expenses:Education "month"    2000.0 USD
 
 2021-01-02 * "Test Payee 2" "Clothes etc"
     Expenses:Clothing                          300.0 USD
@@ -173,8 +173,8 @@ def testBudgetRedefinitionOverridesOldValue(monkeypatch):
 2001-01-01 open Expenses:Clothing
 2001-01-01 open Expenses:Education
 
-2021-01-01 custom "budget" Expenses:Clothing     1000.0 USD
-2021-01-01 custom "budget" Expenses:Clothing    2000.0 USD
+2021-01-01 custom "budget" Expenses:Clothing "month"     1000.0 USD
+2021-01-01 custom "budget" Expenses:Clothing "month"    2000.0 USD
 
   """)
 
@@ -213,3 +213,35 @@ def testAutomaticallyAddsZeroBudget(monkeypatch):
       assert br.getTotalRemaining() == -400.0
       assert br.getAccountBudget('Expenses:Groceries') == 0.0
       assert br.getAccountExpense('Expenses:Groceries') == 400.0
+
+def testCorrectlyReadsBudgetPeriodicity(monkeypatch):
+    entries, errors, options_map = loader.load_string("""
+    2001-01-01 open Assets:CashInHand
+    2001-01-01 open Expenses:Groceries
+
+    2001-01-01 custom "budget" Expenses:Groceries "year"  12000.0 RS
+    2001-01-01 custom "budget" Expenses:Groceries "biannual"  6000.0 RS
+    2001-01-01 custom "budget" Expenses:Groceries "quarter"  3000.0 RS
+    2001-01-01 custom "budget" Expenses:Groceries "month"  1000.0 RS
+    2001-01-01 custom "budget" Expenses:Groceries "week"  250.0 RS
+    2001-01-01 custom "budget" Expenses:Groceries "day"  30.0 RS
+
+    """)
+
+    with monkeypatch.context() as m:
+      m.setattr(sys, "argv", ["prog", "testfile.bean"])
+
+      parser = main.init_arg_parser()
+      test_args = parser.parse_args()
+
+      # br = report.generateBudgetReport(entries, options_map, test_args)
+      # assert br.total_budget == 0.0
+      # assert br.total_expenses == 400.0
+      # assert br.getTotalRemaining() == -400.0
+      # assert br.getAccountBudget('Expenses:Groceries') == 0.0
+      # assert br.getAccountExpense('Expenses:Groceries', 'year') == 12000.0
+      # assert br.getAccountExpense('Expenses:Groceries', 'biannual') == 6000.0
+      # assert br.getAccountExpense('Expenses:Groceries', 'quarter') == 3000.0
+      # assert br.getAccountExpense('Expenses:Groceries', 'month') == 1000.0
+      # assert br.getAccountExpense('Expenses:Groceries', 'week') == 250.0
+      # assert br.getAccountExpense('Expenses:Groceries', 'day') == 30.0
