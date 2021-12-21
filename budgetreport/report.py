@@ -4,33 +4,7 @@ import datetime as dt
 import beancount
 from beancount.query import query
 from tabulate import tabulate
-
-
-class BudgetReportItem:
-    def __init__(self, date, account, budget):
-        self.date = date
-        self.account = account
-        self.budget = float(budget)
-        self.expense = 0.0
-
-    def __str__(self):
-        return [self.date, self.account, self.budget, self.expense]
-
-    def getRemaining(self):
-        return self.budget - self.expense
-
-    def getPercentExpense(self):
-        if self.budget:
-            return round(100.0 * float(self.expense) / float(self.budget), 1)
-
-    def getPercentRemaining(self):
-        if self.budget:
-            return round(100.0 * float(self.getRemaining()) / float(self.budget), 1)
-
-    def toList(self):
-        return [self.account, self.budget, self.expense,
-                self.getPercentExpense(), self.getRemaining(),
-                self.getPercentRemaining()]
+from budget import BudgetItem
 
 class BudggetReport:
     def __init__(self) -> None:
@@ -43,7 +17,7 @@ class BudggetReport:
             self.total_budget -= self.budgetReportItems[account].budget
             self.budgetReportItems[account].budget = budget # update budget
         else:
-            be = BudgetReportItem(date, account, budget)
+            be = BudgetItem(date, account, budget)
             self.budgetReportItems[account] = be # add new budget
             
         self.total_budget += float(budget)
@@ -73,7 +47,7 @@ class BudggetReport:
         if not self.total_budget == 0:
             return round(100.0 * float(self.getTotalRemaining()) / float(self.total_budget), 1)
 
-    def getBudgetReportItems(self):
+    def getBudgetItems(self):
         return self.budgetReportItems
 
     def toList(self):
@@ -120,7 +94,7 @@ def collectBudgetAccounts(entries, options_map, args, br):
         entries, options_map, acct_query, '', numberify=True)
     #print('acct_query result = {}'.format(tabulate(rrows)))
 
-    budgetted_accounts = {**br.getBudgetReportItems()}
+    budgetted_accounts = {**br.getBudgetItems()}
 
     for i in range(len(rrows)):
         #date = rrows[i][0]
@@ -129,10 +103,10 @@ def collectBudgetAccounts(entries, options_map, args, br):
             # dt.date.today().strftime("%Y-%m-%d")
             br.addBudget(dt.date.today().strftime("%Y-%m-%d"), account, 0.0)
 
-    return {**br.getBudgetReportItems()} # return a copy for iteration
+    return {**br.getBudgetItems()} # return a copy for iteration
 
 
-# getBudgetReport : entries, options_map -> { account: BudgetReportItem }
+# getBudgetReport : entries, options_map -> { account: BudgetItem }
 def generateBudgetReport(entries, options_map, args):
     br = BudggetReport()
 
