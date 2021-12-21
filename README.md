@@ -4,21 +4,21 @@
 
 If you use the text-based ledger system ie [beancount](https://github.com/beancount/beancount), and feel the need for a tools to track your expenses against your budget, then this tool may be what you need.
 
-`budget_report` is a simple tool to read beancount ledger files as input and generate simple budget report based on the budget entries within the input beancount file. 
+`budget-report` is a simple tool to read beancount ledger files as input and generate simple budget report based on the budget entries within the input beancount file. 
 
 ## 2. Installation
 
-The simplest way to install and use `budget_report` is via pip:  
+The simplest way to install and use `budget-report` is via pip:  
 
-`pip install budget_report`, for installing globally
+`pip install budget-report`, for installing globally
 
 or  
 
-`pip install budget_report --user`, if you want to install for local user  
+`pip install budget-report --user`, if you want to install for local user  
 
 ## 3. How-To Use
 
-Using `budget_report` with your beancount files is a three step process:  
+Using `budget-report` with your beancount files is a three step process:  
 
 1. Specify your budget in the beancount files,  
 2. Specifying the transactions to include in a particular budget and  
