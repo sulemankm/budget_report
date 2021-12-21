@@ -13,3 +13,6 @@
 
 /.eggs/
 /.vscode/
+
+Pipfile
+Pipfile.lock
