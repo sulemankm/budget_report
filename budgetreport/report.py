@@ -1,3 +1,4 @@
+# report.py
 import re
 import datetime as dt
 import beancount
@@ -7,34 +8,34 @@ from .budget import BudgetItem
 
 class BudggetReport:
     def __init__(self) -> None:
-        self.budgetReportItems = {} # An dict to store budget report items
+        self.budgetItems = {} # An dict to store budget report items
         self.total_budget = 0.0
         self.total_expenses = 0.0
 
     def addBudget(self, date, account, period, budget):
-        if account in self.budgetReportItems:
-            self.total_budget -= self.budgetReportItems[account].budget
-            self.budgetReportItems[account].period = period
-            self.budgetReportItems[account].budget = budget # update budget
+        if account in self.budgetItems:
+            self.total_budget -= self.budgetItems[account].budget
+            self.budgetItems[account].period = period
+            self.budgetItems[account].budget = budget # update budget
         else:
             be = BudgetItem(date, account, period, budget)
-            self.budgetReportItems[account] = be # add new budget
+            self.budgetItems[account] = be # add new budget
             
         self.total_budget += float(budget)
         
 
     def addBudgetExpense(self, date, account, expense):
-        if not account in self.budgetReportItems: # if budget does no exist
+        if not account in self.budgetItems: # if budget does no exist
             raise Exception(
                 'addBudgetExpense: Unhandled account {} in budget.'.format(account))
         self.total_expenses += float(expense)
-        self.budgetReportItems[account].expense += float(expense)
+        self.budgetItems[account].expense += float(expense)
 
     def getAccountBudget(self, account):
-        return self.budgetReportItems[account].budget
+        return self.budgetItems[account].budget
 
     def getAccountExpense(self, account):
-        return self.budgetReportItems[account].expense
+        return self.budgetItems[account].expense
 
     def getTotalRemaining(self):
         return self.total_budget - self.total_expenses
@@ -48,12 +49,12 @@ class BudggetReport:
             return round(100.0 * float(self.getTotalRemaining()) / float(self.total_budget), 1)
 
     def getBudgetItems(self):
-        return self.budgetReportItems
+        return self.budgetItems
 
     def toList(self):
         result = []
-        for account in self.budgetReportItems:
-            result.append(self.budgetReportItems[account].toList())
+        for account in self.budgetItems:
+            result.append(self.budgetItems[account].toList())
         # Append totals
         result.append(['Totals', self.total_budget, self.total_expenses,
             self.getPercentExpenses(), self.getTotalRemaining(),
