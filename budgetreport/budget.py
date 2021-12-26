@@ -26,4 +26,3 @@ class BudgetItem:
         return [self.account, self.budget, self.expense,
                 self.getPercentExpense(), self.getRemaining(),
                 self.getPercentRemaining()]
-                

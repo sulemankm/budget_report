@@ -9,7 +9,7 @@ from .budget import BudgetItem
 class Period:
     def __init__(self, period):
         self.period = period
-        
+
     def getPeriodStart(self, date):
         if self.period == 'year':
             return dt(date.year, 1, 1)
@@ -30,7 +30,7 @@ class Period:
             return date
         else:
             return dt(1970, 1, 1) # If period == 'none', then period starts from 1970
-
+ 
     def getPeriodEnd(self, date):
         last_day_of_month = calendar.monthrange(date.year, date.month)[1]
         if self.period == 'year':
@@ -70,9 +70,8 @@ class BudggetReport:
         else:
             be = BudgetItem(date, account, period, budget)
             self.budgetItems[account] = be # add new budget
-            
+
         self.total_budget += float(budget)
-        
 
     def addBudgetExpense(self, date, account, expense):
         if not account in self.budgetItems: # if budget does no exist

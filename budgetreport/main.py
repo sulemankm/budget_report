@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 # main.py
 
-import argparse
+import argparse, sys
 import pkg_resources  # part of setuptools
-from budgetreport import report
 from beancount import loader
+
+from pathlib import Path
+file = Path(__file__).resolve()
+package_root_directory = file.parents [1]
+sys.path.append(str(package_root_directory))
+
+from budgetreport import report
 
 def init_arg_parser():
     parser = argparse.ArgumentParser(description="Budget report for beancount files")
