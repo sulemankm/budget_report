@@ -1,16 +1,66 @@
 # report.py
-import re
-import datetime as dt
+import re, calendar
+from datetime import datetime as dt
 import beancount
 from beancount.query import query
 from tabulate import tabulate
 from .budget import BudgetItem
 
+class Period:
+    def __init__(self, period):
+        self.period = period
+        
+    def getPeriodStart(self, date):
+        if self.period == 'year':
+            return dt(date.year, 1, 1)
+        elif self.period == 'biannual':
+            if date.month < 7:
+                return dt(date.year, 1, 1) # 1st January
+            else:
+                return dt(date.year, 7, 1) # 1st July
+        elif self.period == 'month':
+            return dt(date.year, date.month, 1)
+        elif self.period == 'week':
+            if date.day < 8: day = 1
+            elif date.day < 15: day = 8
+            elif date.day < 22: day = 15
+            else: day = 22 # FIXME: Last week may be 7 to 10 days
+            return dt(date.year, date.month, day)
+        elif self.period == 'day':
+            return date
+        else:
+            return dt(1970, 1, 1) # If period == 'none', then period starts from 1970
+
+    def getPeriodEnd(self, date):
+        last_day_of_month = calendar.monthrange(date.year, date.month)[1]
+        if self.period == 'year':
+            return dt(date.year, 12, 31)
+        elif self.period == 'biannual':
+            if date.month < 7:
+                return dt(date.year, 6, 30) # 1st January
+            else:
+                return dt(date.year, 12, 31) # 1st July
+        elif self.period == 'month':
+            return dt(date.year, date.month, last_day_of_month)
+        elif period == 'week':
+            if date.day < 8: day = 7
+            elif date.day < 15: day = 14
+            elif date.day < 22: day = 21
+            else: day = last_day_of_month # FIXME: Last week may be 7 to 10 days
+            return dt(date.year, date.month, day)
+        elif self.period == 'day':
+            return date
+        else:
+            return date
+    
 class BudggetReport:
     def __init__(self) -> None:
         self.budgetItems = {} # An dict to store budget report items
         self.total_budget = 0.0
         self.total_expenses = 0.0
+        self.start_date = dt.today()
+        self.end_date = dt.today()
+        self.tag = ''
 
     def addBudget(self, date, account, period, budget):
         if account in self.budgetItems:
@@ -51,6 +101,12 @@ class BudggetReport:
     def getBudgetItems(self):
         return self.budgetItems
 
+
+    def setPeriod(self, period):
+        self.period = Period(period)
+        self.start_date = self.period.getPeriodStart(dt.today())
+        self.end_date = self.period.getPeriodEnd(dt.today())
+
     def toList(self):
         result = []
         for account in self.budgetItems:
@@ -70,10 +126,16 @@ class BudggetReport:
 def collectBudgetAccounts(entries, options_map, args, br):
     # Collect all budgets
     for entry in entries:
-        if isinstance(entry, beancount.core.data.Custom) and entry.type == 'budget':
-            br.addBudget(entry.date, str(entry.values[0].value), entry.values[1], abs(
-                entry.values[2].value.number))
-   
+        #period = entry.values[1].value
+        if args.period:
+            if isinstance(entry, beancount.core.data.Custom) and entry.type == 'budget' and period == args.period:
+                br.addBudget(entry.date, str(entry.values[0].value), entry.values[1], abs(
+                    entry.values[2].value.number))
+        else:
+            if isinstance(entry, beancount.core.data.Custom) and entry.type == 'budget':
+                br.addBudget(entry.date, str(entry.values[0].value), "none", abs(
+                    entry.values[2].value.number))
+
     # Collect expense accounts not budgetted but have expenses
     acct_query = "select account WHERE account ~ 'Expense' "
     if args.tag:
@@ -102,7 +164,7 @@ def collectBudgetAccounts(entries, options_map, args, br):
         if not account in budgetted_accounts:
             # dt.date.today().strftime("%Y-%m-%d")
             # Automatically add a monthly budget for unbudgetted transactions
-            br.addBudget(dt.date.today().strftime("%Y-%m-%d"), account, "month", 0.0)
+            br.addBudget(dt.today().strftime("%Y-%m-%d"), account, "none", 0.0)
 
     return {**br.getBudgetItems()} # return a copy for iteration
 
@@ -110,6 +172,14 @@ def collectBudgetAccounts(entries, options_map, args, br):
 # getBudgetReport : entries, options_map -> { account: BudgetItem }
 def generateBudgetReport(entries, options_map, args):
     br = BudggetReport()
+    if args.tag:
+        br.tag = args.tag
+    if args.period:
+        br.setPeriod(args.period)
+    if args.start_date:
+        br.start_date = args.start_date
+    if args.end_date:
+        br.end_date = args.end_date
 
     budgetted_accounts = collectBudgetAccounts(entries, options_map, args, br)
     # print(tabulate([(key, budgetted_accounts[key].__str__())
@@ -119,13 +189,13 @@ def generateBudgetReport(entries, options_map, args):
     for budget_account in budgetted_accounts:
         postings_query = "select date, account, position, balance AS amount WHERE account = '{}'".format(budget_account)
         if args.tag:
-            postings_query += " and '{}' in tags".format(args.tag)
+            postings_query += " and '{}' in tags".format(br.tag)
 
         if args.start_date:
-            postings_query += " and date >= {}".format(args.start_date)
+            postings_query += " and date >= {}".format(br.start_date)
 
         if args.end_date:
-            postings_query += " and date <= {}".format(args.end_date)
+            postings_query += " and date <= {}".format(br.end_date)
         
         rtypes, rrows = query.run_query(entries, options_map, postings_query, '', numberify=True)
         #print('postings_query result: \n {}'.format(tabulate(rrows)))
