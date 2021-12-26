@@ -42,7 +42,7 @@ class Period:
                 return dt(date.year, 12, 31) # 1st July
         elif self.period == 'month':
             return dt(date.year, date.month, last_day_of_month)
-        elif period == 'week':
+        elif self.period == 'week':
             if date.day < 8: day = 7
             elif date.day < 15: day = 14
             elif date.day < 22: day = 21
