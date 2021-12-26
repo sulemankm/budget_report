@@ -13,6 +13,7 @@ def init_arg_parser():
     parser.add_argument("-t", "--tag", help="Budget tag to use")
     parser.add_argument("-s", "--start-date", help="Budget start date")
     parser.add_argument("-e", "--end-date", help="Budget end date")
+    parser.add_argument("-p", "--period", help="Budget period")
     parser.add_argument("filename", help="Name of beancount file to process")
     return parser
 
