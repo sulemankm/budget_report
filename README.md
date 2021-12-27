@@ -39,7 +39,7 @@ Where:
 - **Amount** is a number specifying the budget amount allocated for this account,  
 - **Currency** is the currency in which budget is specified.  
 
-Here is an example budget:  
+Here is an example budget (Note: the budget period eg "month" is not used by budget-report version 0.2 and below):  
 
     2021-12-06 custom "budget" Liabilities:CreditCard "month"   10000 RS  
     2021-12-06 custom "budget" Expenses:Car:Fuel "month"         5000 RS  
