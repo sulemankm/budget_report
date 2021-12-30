@@ -62,7 +62,7 @@ class BudggetReport:
         self.end_date = dt.today()
         self.tag = ''
 
-    def addBudget(self, date, account, period, budget):
+    def _addBudget(self, date, account, period, budget):
         if account in self.budgetItems:
             self.total_budget -= self.budgetItems[account].budget
             self.budgetItems[account].period = period
@@ -72,6 +72,9 @@ class BudggetReport:
             self.budgetItems[account] = be # add new budget
 
         self.total_budget += float(budget)
+
+    def addBudget(self, budget):
+        self._addBudget(budget.date, budget.account, budget.period, budget.budget)
 
     def addBudgetExpense(self, date, account, expense):
         if not account in self.budgetItems: # if budget does no exist
@@ -122,18 +125,17 @@ class BudggetReport:
         print(tabulate(budget_data, headings, numalign="right", floatfmt=".1f"))
 
 # Collect Budget accounts
-def collectBudgetAccounts(entries, options_map, args, br):
+def collectBudgetAccounts(entries, options_map, args):
+    budgets = {} #BudgetReport()
     # Collect all budgets
     for entry in entries:
-        #period = entry.values[1].value
-        if args.period:
-            if isinstance(entry, beancount.core.data.Custom) and entry.type == 'budget' and period == args.period:
-                br.addBudget(entry.date, str(entry.values[0].value), entry.values[1], abs(
-                    entry.values[2].value.number))
-        else:
-            if isinstance(entry, beancount.core.data.Custom) and entry.type == 'budget':
-                br.addBudget(entry.date, str(entry.values[0].value), "none", abs(
-                    entry.values[2].value.number))
+        if isinstance(entry, beancount.core.data.Custom) and entry.type == 'budget':
+            account = str(entry.values[0].value)
+            period = entry.values[1]
+            budget = abs(entry.values[2].value.number)
+            budgets[account] = BudgetItem(entry.date, account, period, budget)
+            #br.addBudget(entry.date, str(entry.values[0].value), entry.values[1], abs(
+            #    entry.values[2].value.number))
 
     # Collect expense accounts not budgetted but have expenses
     acct_query = "select account WHERE account ~ 'Expense' "
@@ -156,16 +158,17 @@ def collectBudgetAccounts(entries, options_map, args, br):
         entries, options_map, acct_query, '', numberify=True)
     #print('acct_query result = {}'.format(tabulate(rrows)))
 
-    budgetted_accounts = {**br.getBudgetItems()}
+    #budgetted_accounts = {**br.getBudgetItems()}
     for i in range(len(rrows)):
         #date = rrows[i][0]
         account = rrows[i][0]
-        if not account in budgetted_accounts:
+        if not account in budgets: #budgetted_accounts:
             # dt.date.today().strftime("%Y-%m-%d")
             # Automatically add a monthly budget for unbudgetted transactions
-            br.addBudget(dt.today().strftime("%Y-%m-%d"), account, "none", 0.0)
+            #br.addBudget(dt.today().strftime("%Y-%m-%d"), account, "none", 0.0)
+            budgets[account] = BudgetItem(dt.today().strftime("%Y-%m-%d"), account, "none", 0.0)
 
-    return {**br.getBudgetItems()} # return a copy for iteration
+    return budgets #{**br.getBudgetItems()} # return a copy for iteration
 
 
 # getBudgetReport : entries, options_map -> { account: BudgetItem }
@@ -180,7 +183,9 @@ def generateBudgetReport(entries, options_map, args):
     if args.end_date:
         br.end_date = args.end_date
 
-    budgetted_accounts = collectBudgetAccounts(entries, options_map, args, br)
+    budgetted_accounts = collectBudgetAccounts(entries, options_map, args)
+    for account in budgetted_accounts:
+        br.addBudget(budgetted_accounts[account])
     # print(tabulate([(key, budgetted_accounts[key].__str__())
     #       for key in budgetted_accounts.keys()]))
 
