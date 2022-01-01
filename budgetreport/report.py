@@ -53,7 +53,7 @@ class Period:
         else:
             return date
     
-class BudggetReport:
+class BudgetReport:
     def __init__(self) -> None:
         self.budgetItems = {} # An dict to store budget report items
         self.total_budget = 0.0
@@ -61,10 +61,11 @@ class BudggetReport:
         self.start_date = dt.today()
         self.end_date = dt.today()
         self.tag = ''
+        self.period = Period('none')
 
     def _addBudget(self, date, account, period, budget):
         if account in self.budgetItems:
-            self.total_budget -= self.budgetItems[account].budget
+            self.total_budget -= float(self.budgetItems[account].budget)
             self.budgetItems[account].period = period
             self.budgetItems[account].budget = budget # update budget
         else:
@@ -74,12 +75,19 @@ class BudggetReport:
         self.total_budget += float(budget)
 
     def addBudget(self, budget):
+        # print('addBudget: budget: ', budget)
+        # print('B4 _addBudget: self.budgetItems: ', self.budgetItems)
         self._addBudget(budget.date, budget.account, budget.period, budget.budget)
+        # print('After _addBudget: self.budgetItems: ', self.budgetItems)
 
     def addBudgetExpense(self, date, account, expense):
-        if not account in self.budgetItems: # if budget does no exist
-            raise Exception(
-                'addBudgetExpense: Unhandled account {} in budget.'.format(account))
+        # print("\naddBudgetExpense:")
+        # print("self.period:", self.period)
+        # print("Account:", account)
+        # print("self.budgetItems: ", self.budgetItems)
+        if not (account in self.budgetItems): # if budget does no exist
+            raise Exception('addBudgetExpense: Unhandled account {} in budget.\nself.budgetItems: {}'.format(
+                account, self.budgetItems))
         self.total_expenses += float(expense)
         self.budgetItems[account].expense += float(expense)
 
@@ -90,7 +98,7 @@ class BudggetReport:
         return self.budgetItems[account].expense
 
     def getTotalRemaining(self):
-        return self.total_budget - self.total_expenses
+        return float(self.total_budget) - float(self.total_expenses)
 
     def getPercentExpenses(self):
         if not self.total_budget == 0:
@@ -102,7 +110,6 @@ class BudggetReport:
 
     def getBudgetItems(self):
         return self.budgetItems
-
 
     def setPeriod(self, period):
         self.period = Period(period)
@@ -124,56 +131,54 @@ class BudggetReport:
         budget_data = self.toList()
         print(tabulate(budget_data, headings, numalign="right", floatfmt=".1f"))
 
-# Collect Budget accounts
-def collectBudgetAccounts(entries, options_map, args):
-    budgets = {} #BudgetReport()
-    # Collect all budgets
-    for entry in entries:
-        if isinstance(entry, beancount.core.data.Custom) and entry.type == 'budget':
-            account = str(entry.values[0].value)
-            period = entry.values[1]
-            budget = abs(entry.values[2].value.number)
-            budgets[account] = BudgetItem(entry.date, account, period, budget)
-            #br.addBudget(entry.date, str(entry.values[0].value), entry.values[1], abs(
-            #    entry.values[2].value.number))
+    # Collect Budget accounts
+    def collectBudgets(self, entries, options_map, args):
+        # budgets = {} #BudgetReport()
+        # Collect all budgets
+        for entry in entries:
+            if isinstance(entry, beancount.core.data.Custom) and entry.type == 'budget':
+                account = str(entry.values[0].value)
+                period = entry.values[1].value
+                budget = abs(entry.values[2].value.number)
+                self._addBudget(entry.date, account, period, budget)
+                # self.budgetItems[account] = BudgetItem(
+                #     entry.date, account, period, budget)
+                # budgets[account] = BudgetItem(entry.date, account, period, budget)
+                #br.addBudget(entry.date, str(entry.values[0].value), entry.values[1].value, abs(
+                #    entry.values[2].value.number))
 
-    # Collect expense accounts not budgetted but have expenses
-    acct_query = "select account WHERE account ~ 'Expense' "
-    if args.tag:
-        acct_query += "and '{}' in tags".format(args.tag)
+        # Collect expense accounts not budgetted but have expenses
+        acct_query = "select account WHERE account ~ 'Expense' "
+        if args.tag:
+            acct_query += "and '{}' in tags".format(args.tag)
 
-    if args.start_date:
-        # if args.tag:
-        #     acct_query += " and "
-        acct_query += "and date >= {}".format(args.start_date)
+        if args.start_date:
+            acct_query += "and date >= {}".format(args.start_date)
 
-    if args.end_date:
-        # if args.tag or args.start_date:
-        #     acct_query += " and "
-        # else:
-        #     acct_query += " WHERE "
-        acct_query += "and date <= {}".format(args.end_date)
+        if args.end_date:
+            acct_query += "and date <= {}".format(args.end_date)
 
-    rtypes, rrows = query.run_query(
-        entries, options_map, acct_query, '', numberify=True)
-    #print('acct_query result = {}'.format(tabulate(rrows)))
+        rtypes, rrows = query.run_query(
+            entries, options_map, acct_query, '', numberify=True)
+        #print('acct_query result = {}'.format(tabulate(rrows)))
 
-    #budgetted_accounts = {**br.getBudgetItems()}
-    for i in range(len(rrows)):
-        #date = rrows[i][0]
-        account = rrows[i][0]
-        if not account in budgets: #budgetted_accounts:
-            # dt.date.today().strftime("%Y-%m-%d")
-            # Automatically add a monthly budget for unbudgetted transactions
-            #br.addBudget(dt.today().strftime("%Y-%m-%d"), account, "none", 0.0)
-            budgets[account] = BudgetItem(dt.today().strftime("%Y-%m-%d"), account, "none", 0.0)
+        for i in range(len(rrows)):
+            account = rrows[i][0]
+            if not account in self.budgetItems: # budgets: #budgetted_accounts:
+                assert not account in self.budgetItems #budgets
+                self._addBudget(dt.today().strftime(
+                    "%Y-%m-%d"), account, args.period, 0.0)
+                # self.budgetItems[account] = BudgetItem(dt.today().strftime(
+                #     "%Y-%m-%d"), account, args.period, 0.0)
+                #budgets[account] = BudgetItem(dt.today().strftime("%Y-%m-%d"), account, args.period, 0.0)
 
-    return budgets #{**br.getBudgetItems()} # return a copy for iteration
-
+        # print("collectBudgets():")
+        # print(self.budgetItems)
+        #return budgets #{**br.getBudgetItems()} # return a copy for iteration
 
 # getBudgetReport : entries, options_map -> { account: BudgetItem }
 def generateBudgetReport(entries, options_map, args):
-    br = BudggetReport()
+    br = BudgetReport()
     if args.tag:
         br.tag = args.tag
     if args.period:
@@ -183,15 +188,23 @@ def generateBudgetReport(entries, options_map, args):
     if args.end_date:
         br.end_date = args.end_date
 
-    budgetted_accounts = collectBudgetAccounts(entries, options_map, args)
-    for account in budgetted_accounts:
-        br.addBudget(budgetted_accounts[account])
+    #budgets = collectBudgets(entries, options_map, args)
+    br.collectBudgets(entries, options_map, args)
+    # print("\ngenerateBudgetReport:")
+    # print(budgets)
+    # for (account, budget) in budgets.items():
+    #     print(account, ': ', budget)
+    #     if budget.period == args.period:
+    #         br.addBudget(budget)
+            #br._addBudget(budget.date, budget.account, budget.period, budget.budget)
+
+    # print('br.budgetItems: ', br.budgetItems)
     # print(tabulate([(key, budgetted_accounts[key].__str__())
     #       for key in budgetted_accounts.keys()]))
 
     # Get actual postings for all budget accounts
-    for budget_account in budgetted_accounts:
-        postings_query = "select date, account, position, balance AS amount WHERE account = '{}'".format(budget_account)
+    for account in br.budgetItems: # budgets:
+        postings_query = "select date, account, position, balance AS amount WHERE account = '{}'".format(account)
         if args.tag:
             postings_query += " and '{}' in tags".format(br.tag)
 
@@ -200,13 +213,13 @@ def generateBudgetReport(entries, options_map, args):
 
         if args.end_date:
             postings_query += " and date <= {}".format(br.end_date)
-        
+
         rtypes, rrows = query.run_query(entries, options_map, postings_query, '', numberify=True)
         #print('postings_query result: \n {}'.format(tabulate(rrows)))
 
         if len(rrows) != 0:
             date = rrows[len(rrows)-1][0] # Get date of last posting
-            account = budget_account #rrows[len(rrows)-1][1]
+            #account = account #rrows[len(rrows)-1][1]
             amount = abs(rrows[len(rrows)-1][3]) # get balance from last row
             if amount == 0.0:
                 print('Warning: adding zero expense for account= {}'.format(account))
