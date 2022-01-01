@@ -234,7 +234,7 @@ def testCorrectlyReadsBudgetPeriodicity(monkeypatch):
       parser = main.init_arg_parser()
       test_args = parser.parse_args()
 
-      # br = report.generateBudgetReport(entries, options_map, test_args)
+      br = report.generateBudgetReport(entries, options_map, test_args)
       # assert br.total_budget == 0.0
       # assert br.total_expenses == 400.0
       # assert br.getTotalRemaining() == -400.0
@@ -245,3 +245,4 @@ def testCorrectlyReadsBudgetPeriodicity(monkeypatch):
       # assert br.getAccountExpense('Expenses:Groceries', 'month') == 1000.0
       # assert br.getAccountExpense('Expenses:Groceries', 'week') == 250.0
       # assert br.getAccountExpense('Expenses:Groceries', 'day') == 30.0
+ 
