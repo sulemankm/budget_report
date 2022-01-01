@@ -1,3 +1,4 @@
+
 ; -*- mode: org; mode: beancount -*-
 option "insert_pythonpath" "True"
 ;plugin "bean_budget"
@@ -15,6 +16,7 @@ option "insert_pythonpath" "True"
 1970-01-01 open Expenses:Charity  RS
 1970-01-01 open Expenses:Clothing  RS
 1970-01-01 open Expenses:Education:Fees  RS
+1970-01-01 open Expenses:Education:Stationary  RS
 1970-01-01 open Expenses:Food:DiningOut  RS
 1970-01-01 open Expenses:Gardening  RS
 1970-01-01 open Expenses:Groceries  RS
@@ -32,15 +34,15 @@ option "insert_pythonpath" "True"
 ;   c. Format of budget entry is as below:
 ;      <Date> custom "budget" <Account>  <Amount> <Currency>
 ;============================================================
-2021-12-06 custom "budget" Liabilities:CreditCard   10000 RS
-2021-12-06 custom "budget" Expenses:Car:Fuel       5000.0 RS
-2021-12-06 custom "budget" Expenses:Clothing        10000 RS
-2021-12-06 custom "budget" Expenses:Education:Fees  11000 RS
-2021-12-06 custom "budget" Expenses:Food:DiningOut  10000 RS
-2021-12-06 custom "budget" Expenses:Gardening         0.0 RS
-2021-12-06 custom "budget" Expenses:Groceries       50000 RS
-2021-12-06 custom "budget" Expenses:Medicine         2000 RS
-2021-12-06 custom "budget" Expenses:PocketMoney     10000 RS
+2021-12-06 custom "budget" Liabilities:CreditCard "month"   10000 RS
+2021-12-06 custom "budget" Expenses:Car:Fuel "month"  5000.0 RS
+2021-12-06 custom "budget" Expenses:Clothing "month"  10000 RS
+2021-12-06 custom "budget" Expenses:Education:Fees "month"  11000 RS
+2021-12-06 custom "budget" Expenses:Food:DiningOut "month"  10000 RS
+2021-12-06 custom "budget" Expenses:Gardening "month"  0.0 RS
+2021-12-06 custom "budget" Expenses:Groceries "month"  50000 RS
+2021-12-06 custom "budget" Expenses:Medicine "month"  2000 RS
+2021-12-06 custom "budget" Expenses:PocketMoney "month"  10000 RS
 
 ;============================================================
 ; Test transactions
@@ -78,5 +80,9 @@ option "insert_pythonpath" "True"
     
 2021-12-08 * "Home Store" "Gardening Items"
   Expenses:Gardening                         2000.0 RS
+  Assets:CashInHand
+  
+2021-12-31 * "Bookstore" "Stationary"
+  Expenses:Education:Stationary               200.0 RS
   Assets:CashInHand
   
