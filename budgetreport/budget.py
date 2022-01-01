@@ -9,10 +9,10 @@ class BudgetItem:
         self.expense = 0.0
 
     def __str__(self):
-        return [self.date, self.account, self.budget, self.expense]
+        return 'BudgetItem: ' + str(self.date) + ' ' + str(self.account) + ' ' + str(self.period) + ' ' + str(self.budget) + ' ' + str(self.expense)
 
     def getRemaining(self):
-        return self.budget - self.expense
+        return float(self.budget) - float(self.expense)
 
     def getPercentExpense(self):
         if self.budget:
