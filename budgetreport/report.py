@@ -28,16 +28,9 @@ class BudgetReport:
         self.total_budget += float(budget)
 
     def addBudget(self, budget):
-        # print('addBudget: budget: ', budget)
-        # print('B4 _addBudget: self.budgetItems: ', self.budgetItems)
         self._addBudget(budget.date, budget.account, budget.period, budget.budget)
-        # print('After _addBudget: self.budgetItems: ', self.budgetItems)
 
     def addBudgetExpense(self, date, account, expense):
-        # print("\naddBudgetExpense:")
-        # print("self.period:", self.period)
-        # print("Account:", account)
-        # print("self.budgetItems: ", self.budgetItems)
         if not (account in self.budgetItems): # if budget does no exist
             raise Exception('addBudgetExpense: Unhandled account {} in budget.\nself.budgetItems: {}'.format(
                 account, self.budgetItems))
@@ -86,7 +79,6 @@ class BudgetReport:
 
     # Collect Budget accounts
     def collectBudgets(self, entries, options_map, args):
-        # budgets = {} #BudgetReport()
         # Collect all budgets
         for entry in entries:
             if isinstance(entry, beancount.core.data.Custom) and entry.type == 'budget':
@@ -94,11 +86,6 @@ class BudgetReport:
                 period = entry.values[1].value
                 budget = abs(entry.values[2].value.number)
                 self._addBudget(entry.date, account, period, budget)
-                # self.budgetItems[account] = BudgetItem(
-                #     entry.date, account, period, budget)
-                # budgets[account] = BudgetItem(entry.date, account, period, budget)
-                #br.addBudget(entry.date, str(entry.values[0].value), entry.values[1].value, abs(
-                #    entry.values[2].value.number))
 
         # Collect expense accounts not budgetted but have expenses
         acct_query = "select account WHERE account ~ 'Expense' "
@@ -113,7 +100,6 @@ class BudgetReport:
 
         rtypes, rrows = query.run_query(
             entries, options_map, acct_query, '', numberify=True)
-        #print('acct_query result = {}'.format(tabulate(rrows)))
 
         for i in range(len(rrows)):
             account = rrows[i][0]
@@ -121,13 +107,6 @@ class BudgetReport:
                 assert not account in self.budgetItems #budgets
                 self._addBudget(dt.today().strftime(
                     "%Y-%m-%d"), account, args.period, 0.0)
-                # self.budgetItems[account] = BudgetItem(dt.today().strftime(
-                #     "%Y-%m-%d"), account, args.period, 0.0)
-                #budgets[account] = BudgetItem(dt.today().strftime("%Y-%m-%d"), account, args.period, 0.0)
-
-        # print("collectBudgets():")
-        # print(self.budgetItems)
-        #return budgets #{**br.getBudgetItems()} # return a copy for iteration
 
 # getBudgetReport : entries, options_map -> { account: BudgetItem }
 def generateBudgetReport(entries, options_map, args):
@@ -141,19 +120,7 @@ def generateBudgetReport(entries, options_map, args):
     if args.end_date:
         br.end_date = args.end_date
 
-    #budgets = collectBudgets(entries, options_map, args)
     br.collectBudgets(entries, options_map, args)
-    # print("\ngenerateBudgetReport:")
-    # print(budgets)
-    # for (account, budget) in budgets.items():
-    #     print(account, ': ', budget)
-    #     if budget.period == args.period:
-    #         br.addBudget(budget)
-            #br._addBudget(budget.date, budget.account, budget.period, budget.budget)
-
-    # print('br.budgetItems: ', br.budgetItems)
-    # print(tabulate([(key, budgetted_accounts[key].__str__())
-    #       for key in budgetted_accounts.keys()]))
 
     # Get actual postings for all budget accounts
     for account in br.budgetItems: # budgets:
@@ -168,11 +135,9 @@ def generateBudgetReport(entries, options_map, args):
             postings_query += " and date <= {}".format(br.end_date)
 
         rtypes, rrows = query.run_query(entries, options_map, postings_query, '', numberify=True)
-        #print('postings_query result: \n {}'.format(tabulate(rrows)))
 
         if len(rrows) != 0:
             date = rrows[len(rrows)-1][0] # Get date of last posting
-            #account = account #rrows[len(rrows)-1][1]
             amount = abs(rrows[len(rrows)-1][3]) # get balance from last row
             if amount == 0.0:
                 print('Warning: adding zero expense for account= {}'.format(account))

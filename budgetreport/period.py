@@ -26,7 +26,7 @@ class Period:
             return date
         else:
             return dt(1970, 1, 1) # If period == 'none', then period starts from 1970
- 
+
     def getPeriodEnd(self, date):
         last_day_of_month = calendar.monthrange(date.year, date.month)[1]
         if self.period == 'year':
