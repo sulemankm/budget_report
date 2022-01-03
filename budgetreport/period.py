@@ -15,6 +15,15 @@ class Period:
                 ret = dt(date.year, 1, 1) # 1st January
             else:
                 ret = dt(date.year, 7, 1) # 1st July
+        elif self.period == 'quarter':
+            if date.month >= 1 and date.month <= 3:
+                ret = dt(date.year, 1, 1)
+            elif date.month >= 4 and date.month <= 6:
+                ret = dt(date.year, 4, 1)
+            elif date.month >= 7 and date.month <= 9:
+                ret = dt(date.year, 7, 1)
+            else:
+                ret = dt(date.year, 10, 1)
         elif self.period == 'month':
             ret = dt(date.year, date.month, 1)
         elif self.period == 'week':
@@ -39,6 +48,15 @@ class Period:
                 ret = dt(date.year, 6, 30) # 1st January
             else:
                 ret = dt(date.year, 12, 31) # 1st July
+        elif self.period == 'quarter':
+            if date.month >= 1 and date.month <= 3:
+                ret = dt(date.year, 3, 31)
+            elif date.month >= 4 and date.month <= 6:
+                ret = dt(date.year, 6, 30)
+            elif date.month >= 7 and date.month <= 9:
+                ret = dt(date.year, 9, 30)
+            else:
+                ret = dt(date.year, 12, 31)
         elif self.period == 'month':
             ret = dt(date.year, date.month, last_day_of_month)
         elif self.period == 'week':
@@ -51,5 +69,4 @@ class Period:
             ret = date
         else:
             ret = date
-
         return ret.date()
