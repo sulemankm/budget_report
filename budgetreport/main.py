@@ -16,6 +16,7 @@ def init_arg_parser():
     parser = argparse.ArgumentParser(description="Budget report for beancount files")
     parser.add_argument("-v", "--version", action="version", help="Print version number and exit",
         version='%(prog)s {}'.format(pkg_resources.require("budget_report")[0].version))
+    parser.add_argument('-V', '--verbose', action='store_true', help='Print verbose output for errors')
     parser.add_argument("-t", "--tag", help="Budget tag to use")
     parser.add_argument("-s", "--start-date", help="Budget start date")
     parser.add_argument("-e", "--end-date", help="Budget end date")
@@ -29,8 +30,10 @@ def script_main():
 
     entries, errors, options_map = loader.load_file(args.filename)
     if errors:
-       printer.print_errors(errors)
-        #assert False
+        if args.verbose:
+            printer.print_errors(errors)
+        else:
+            print('Warning: {} errors while parsing input file.'.format(len(errors)))
 
     br = report.generateBudgetReport(entries, options_map, args)
     br.printReport(args)
