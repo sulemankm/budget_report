@@ -11,12 +11,13 @@ class BudgetReport:
         self.budgetItems = {} # An dict to store budget report items
         self.total_budget = 0.0
         self.total_expenses = 0.0
-        self.start_date = dt.today()
-        self.end_date = dt.today()
         self.tag = ''
-        self.period = Period('none')
+        self.period = Period('month') # default period is month
+        self.start_date = self.period.getPeriodStart(dt.min)
+        self.end_date = self.period.getPeriodEnd(dt.today())
 
     def _addBudget(self, date, account, period, budget):
+        assert period == self.period.period # only allow adding budget of matching period
         if account in self.budgetItems:
             self.total_budget -= float(self.budgetItems[account].budget)
             self.budgetItems[account].period = period
@@ -32,10 +33,12 @@ class BudgetReport:
 
     def addBudgetExpense(self, date, account, expense):
         if not (account in self.budgetItems): # if budget does no exist
-            raise Exception('addBudgetExpense: Unhandled account {} in budget.\nself.budgetItems: {}'.format(
-                account, self.budgetItems))
-        self.total_expenses += float(expense)
-        self.budgetItems[account].expense += float(expense)
+            raise Exception('addBudgetExpense: Unhandled account {} in budget.\nself.budgetItems: {}'.format(account, self.budgetItems))
+
+        #print('date: ', date, 'start_date: ', self.start_date, 'end_date: ', self.end_date)
+        if date >= self.start_date and date <= self.end_date: # Expense should fall withing the period
+            self.total_expenses += float(expense)
+            self.budgetItems[account].expense += float(expense)
 
     def getAccountBudget(self, account):
         return self.budgetItems[account].budget
@@ -57,10 +60,10 @@ class BudgetReport:
     def getBudgetItems(self):
         return self.budgetItems
 
-    def setPeriod(self, period):
+    def setPeriod(self, period, start_date=dt.today()):
         self.period = Period(period)
-        self.start_date = self.period.getPeriodStart(dt.today())
-        self.end_date = self.period.getPeriodEnd(dt.today())
+        self.start_date = self.period.getPeriodStart(start_date)
+        self.end_date = self.period.getPeriodEnd(start_date)
 
     def toList(self):
         result = []
@@ -81,32 +84,32 @@ class BudgetReport:
     def collectBudgets(self, entries, options_map, args):
         # Collect all budgets
         for entry in entries:
-            if isinstance(entry, beancount.core.data.Custom) and entry.type == 'budget':
+            if isinstance(entry, beancount.core.data.Custom) and entry.type == 'budget' and entry.values[1].value == self.period.period:
                 account = str(entry.values[0].value)
                 period = entry.values[1].value
                 budget = abs(entry.values[2].value.number)
                 self._addBudget(entry.date, account, period, budget)
 
-        # Collect expense accounts not budgetted but have expenses
+        # Collect expense accounts not budgetted but have expenses within the report period
         acct_query = "select account WHERE account ~ 'Expense' "
         if args.tag:
-            acct_query += "and '{}' in tags".format(args.tag)
+            acct_query += " and '{}' in tags ".format(args.tag)
 
         if args.start_date:
-            acct_query += "and date >= {}".format(args.start_date)
+            acct_query += " and date >= {} ".format(args.start_date)
 
         if args.end_date:
-            acct_query += "and date <= {}".format(args.end_date)
+            acct_query += " and date <= {} ".format(args.end_date)
 
         rtypes, rrows = query.run_query(
             entries, options_map, acct_query, '', numberify=True)
 
         for i in range(len(rrows)):
             account = rrows[i][0]
-            if not account in self.budgetItems: # budgets: #budgetted_accounts:
-                assert not account in self.budgetItems #budgets
+            if not account in self.budgetItems:
+                assert not account in self.budgetItems
                 self._addBudget(dt.today().strftime(
-                    "%Y-%m-%d"), account, args.period, 0.0)
+                    "%Y-%m-%d"), account, self.period.period, 0.0)
 
 # getBudgetReport : entries, options_map -> { account: BudgetItem }
 def generateBudgetReport(entries, options_map, args):
@@ -116,9 +119,10 @@ def generateBudgetReport(entries, options_map, args):
     if args.period:
         br.setPeriod(args.period)
     if args.start_date:
-        br.start_date = args.start_date
+        br.start_date = dt.fromisoformat(args.start_date).date()
     if args.end_date:
-        br.end_date = args.end_date
+        br.end_date = dt.fromisoformat(args.end_date).date()
+        assert br.end_date >= br.start_date
 
     br.collectBudgets(entries, options_map, args)
 
@@ -126,14 +130,14 @@ def generateBudgetReport(entries, options_map, args):
     for account in br.budgetItems: # budgets:
         postings_query = "select date, account, position, balance AS amount WHERE account = '{}'".format(account)
         if args.tag:
-            postings_query += " and '{}' in tags".format(br.tag)
+            postings_query += " and '{}' in tags ".format(br.tag)
 
         if args.start_date:
-            postings_query += " and date >= {}".format(br.start_date)
+            postings_query += " and date >= {} ".format(args.start_date)#.strftime('%Y-%m-%d'))
 
         if args.end_date:
-            postings_query += " and date <= {}".format(br.end_date)
-
+            postings_query += " and date <= {} ".format(args.end_date)#.strftime('%Y-%m-%d'))
+        print('query: ', postings_query)
         rtypes, rrows = query.run_query(entries, options_map, postings_query, '', numberify=True)
 
         if len(rrows) != 0:
@@ -141,6 +145,10 @@ def generateBudgetReport(entries, options_map, args):
             amount = abs(rrows[len(rrows)-1][3]) # get balance from last row
             if amount == 0.0:
                 print('Warning: adding zero expense for account= {}'.format(account))
+
+            #print('adding expense: {}-{}'.format(account, amount))
             br.addBudgetExpense(date, account, amount)
+        #else:
+        #    print('Warning: No expenses found for account: {}'.format(account))
 
     return br

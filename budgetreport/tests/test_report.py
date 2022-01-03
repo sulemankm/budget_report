@@ -15,7 +15,7 @@ def testSingleAccountBudget(monkeypatch):
     """)
 
     with monkeypatch.context() as m:
-      m.setattr(sys, "argv", ["prog", "testfile.bean"])
+      m.setattr(sys, "argv", ["prog", '-s', '2001-01-01', "testfile.bean"])
 
       parser = main.init_arg_parser()
       test_args = parser.parse_args()
@@ -40,7 +40,7 @@ def testBudgetWithZeroValue(monkeypatch):
     """)
 
     with monkeypatch.context() as m:
-      m.setattr(sys, "argv", ["prog", "testfile.bean"])
+      m.setattr(sys, "argv", ["prog", '-s', '2001-01-01', "testfile.bean"])
 
       parser = main.init_arg_parser()
       test_args = parser.parse_args()
@@ -78,7 +78,7 @@ def testTaggedBugget(monkeypatch):
     """)
 
     with monkeypatch.context() as m:
-      m.setattr(sys, "argv", ["prog", "-t" "test-budget", "testfile.bean"])
+      m.setattr(sys, "argv", ["prog", "-t", "test-budget", "testfile.bean"])
 
       parser = main.init_arg_parser()
       test_args = parser.parse_args()
@@ -152,7 +152,7 @@ def testMultipleAccountBudgets(monkeypatch):
   """)
 
     with monkeypatch.context() as m:
-      m.setattr(sys, "argv", ["prog", "testfile.bean"])
+      m.setattr(sys, "argv", ["prog", '-s', '2021-01-01', "testfile.bean"])
 
       parser = main.init_arg_parser()
       test_args = parser.parse_args()
@@ -179,7 +179,7 @@ def testBudgetRedefinitionOverridesOldValue(monkeypatch):
   """)
 
     with monkeypatch.context() as m:
-      m.setattr(sys, "argv", ["prog", "testfile.bean"])
+      m.setattr(sys, "argv", ["prog", '-s', '2021-01-01', "testfile.bean"])
 
       parser = main.init_arg_parser()
       test_args = parser.parse_args()
@@ -196,13 +196,13 @@ def testAutomaticallyAddsZeroBudget(monkeypatch):
     2001-01-01 open Assets:CashInHand
     2001-01-01 open Expenses:Groceries
 
-    2021-01-02 * "TestPayee" "Some description"
+    2001-01-02 * "TestPayee" "Some description"
       Expenses:Groceries                    400.0 USD
       Assets:CashInHand
     """)
 
     with monkeypatch.context() as m:
-      m.setattr(sys, "argv", ["prog", "testfile.bean"])
+      m.setattr(sys, "argv", ["prog", '-s', '2001-01-01', "testfile.bean"])
 
       parser = main.init_arg_parser()
       test_args = parser.parse_args()
