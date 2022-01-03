@@ -35,7 +35,7 @@ class BudgetReport:
         if not (account in self.budgetItems): # if budget does no exist
             raise Exception('addBudgetExpense: Unhandled account {} in budget.\nself.budgetItems: {}'.format(account, self.budgetItems))
 
-        #print('date: ', date, 'start_date: ', self.start_date, 'end_date: ', self.end_date)
+        # print('date: ', date, 'start_date: ', self.start_date, 'end_date: ', self.end_date)
         if date >= self.start_date and date <= self.end_date: # Expense should fall withing the period
             self.total_expenses += float(expense)
             self.budgetItems[account].expense += float(expense)
@@ -78,10 +78,10 @@ class BudgetReport:
     def printReport(self, args):
         print('Budget Report:\n  Period: \'{}\''.format(self.period.period))
         if args.start_date:
-            print('  Start:{}, End:{}'.format(self.period.period, self.start_date, self.end_date))
+            print('  Start: {}, End: {}'.format(self.start_date, self.end_date))
         if args.tag:
-            print('  Tag \'{}\'\n'.format(args.tag))
-
+            print('  Tag \'{}\''.format(args.tag))
+        print('\n')
         headings = ['Account', 'Budget', 'Expense', '(%)', 'Remaining', '(%)']
         budget_data = self.toList()
         print(tabulate(budget_data, headings, numalign="right", floatfmt=".1f"))
@@ -125,7 +125,8 @@ def generateBudgetReport(entries, options_map, args):
     if args.period:
         br.setPeriod(args.period)
     if args.start_date:
-        br.start_date = dt.fromisoformat(args.start_date).date()
+        #br.start_date = dt.fromisoformat(args.start_date).date()
+        br.setPeriod(br.period.period, dt.fromisoformat(args.start_date).date())
     if args.end_date:
         br.end_date = dt.fromisoformat(args.end_date).date()
         assert br.end_date >= br.start_date

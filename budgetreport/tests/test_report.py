@@ -15,7 +15,7 @@ def testSingleAccountBudget(monkeypatch):
     """)
 
     with monkeypatch.context() as m:
-      m.setattr(sys, "argv", ["prog", '-s', '2001-01-01', "testfile.bean"])
+      m.setattr(sys, "argv", ["prog", '-s', '2021-01-01', "testfile.bean"])
 
       parser = main.init_arg_parser()
       test_args = parser.parse_args()
@@ -40,7 +40,7 @@ def testBudgetWithZeroValue(monkeypatch):
     """)
 
     with monkeypatch.context() as m:
-      m.setattr(sys, "argv", ["prog", '-s', '2001-01-01', "testfile.bean"])
+      m.setattr(sys, "argv", ["prog", '-s', '2021-01-01', "testfile.bean"])
 
       parser = main.init_arg_parser()
       test_args = parser.parse_args()
