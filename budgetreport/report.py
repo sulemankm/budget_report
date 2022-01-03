@@ -75,7 +75,13 @@ class BudgetReport:
             self.getPercentRemaining()])
         return result
 
-    def printReport(self):
+    def printReport(self, args):
+        print('Budget Report:\n  Period: \'{}\''.format(self.period.period))
+        if args.start_date:
+            print('  Start:{}, End:{}'.format(self.period.period, self.start_date, self.end_date))
+        if args.tag:
+            print('  Tag \'{}\'\n'.format(args.tag))
+
         headings = ['Account', 'Budget', 'Expense', '(%)', 'Remaining', '(%)']
         budget_data = self.toList()
         print(tabulate(budget_data, headings, numalign="right", floatfmt=".1f"))
@@ -137,7 +143,7 @@ def generateBudgetReport(entries, options_map, args):
 
         if args.end_date:
             postings_query += " and date <= {} ".format(args.end_date)#.strftime('%Y-%m-%d'))
-        print('query: ', postings_query)
+        #print('query: ', postings_query)
         rtypes, rrows = query.run_query(entries, options_map, postings_query, '', numberify=True)
 
         if len(rrows) != 0:

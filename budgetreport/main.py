@@ -3,6 +3,7 @@
 import argparse, sys
 import pkg_resources  # part of setuptools
 from beancount import loader
+from beancount.parser import printer
 
 from pathlib import Path
 file = Path(__file__).resolve()
@@ -28,11 +29,11 @@ def script_main():
 
     entries, errors, options_map = loader.load_file(args.filename)
     if errors:
-        print(errors)
+       printer.print_errors(errors)
         #assert False
 
     br = report.generateBudgetReport(entries, options_map, args)
-    br.printReport()
+    br.printReport(args)
 
 if __name__ == "__main__":
     script_main()
