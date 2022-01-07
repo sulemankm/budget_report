@@ -35,7 +35,7 @@ Where:
 
 - **Date** is in the formate **YYYY-MM-DD**,   
 - **Account** is the name of the account you want to specify budget followed by 2 or more spaces,  
-- **Period** is the applicable period of the budget ie one of "year", "biannual", "month", "week" or "day"
+- **Period** is the applicable period of the budget ie one of "year", "biannual", "quarter", "month", "week" or "day"
 - **Amount** is a number specifying the budget amount allocated for this account,  
 - **Currency** is the currency in which budget is specified.  
 
@@ -59,10 +59,11 @@ b. The budget entries could also be put into a separate file such as `mybudget.b
 
 ### 3.2 Specifying Transaction to include in budget  
 
-There are two ways you can tell `budget-report` which transactions to include while computing budget report:  
+By default, `bean-report` includes all transactions with dates falling within the specified budget report period (ie via the -p or --period switch on command line).  If no report period is given, the period is assumed to be "month" (ie current month's budget report would be generated).
 
-a. Using budget name tags in your beancount ledger, and specifying the same tag at `budget-report` command line, or   
-b. Giving start and/or end date(s) as command line argument.   
+a. The default start and/or end date(s) may be overridden by giving other values as command line arguments (-s and -e options), which would then overried the reports's start and end dates.  This may be usefule when say, you are generating report of one month (or other period), but some of the tranactions from a previous (or next) month/period should actually be counted in this budget's report.   
+
+a. Budget name tags can also be used in your beancount ledger to identify/enclose transactions to include in a budget report.  Then the same tag may be specified at the command line while generating the budget report.
 
 #### 3.2.1  Using Budget Tags
 
@@ -119,19 +120,22 @@ c. If both tag and start/end dates are given, bothe will be used to filter the e
 
 You can get help about all `budget-report` options at the command line using the -h switch.
 
-    $ budget-report -h
-    usage: budget-report [-h] [-v] [-t TAG] [-s START_DATE] [-e END_DATE] filename
+    usage: budget-report [-h] [-v] [-V] [-t TAG] [-s START_DATE] [-e END_DATE] [-p PERIOD] filename
 
     Budget report for beancount files
 
     positional arguments:
-    filename              Name of beancount file to process
+      filename              Name of beancount file to process
 
     optional arguments:
-    -h, --help            show this help message and exit
-    -v, --version         Print version number and exit
-    -t TAG, --tag TAG     Budget tag to use
-    -s START_DATE, --start-date START_DATE
+      -h, --help            show this help message and exit
+      -v, --version         Print version number and exit
+      -V, --verbose         Print verbose output for errors
+      -t TAG, --tag TAG     Budget tag to use
+      -s START_DATE, --start-date START_DATE
                             Budget start date
-    -e END_DATE, --end-date END_DATE
+      -e END_DATE, --end-date END_DATE
                             Budget end date
+      -p PERIOD, --period PERIOD
+                            Budget period
+ 
