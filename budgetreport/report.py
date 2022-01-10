@@ -29,6 +29,7 @@ class BudgetReport:
         self.total_budget += float(budget)
 
     def addBudget(self, budget):
+        print('addBudget: {}'.format(budget))
         self._addBudget(budget.date, budget.account, budget.period, budget.budget)
 
     def addBudgetExpense(self, date, account, expense):
@@ -148,13 +149,16 @@ def generateBudgetReport(entries, options_map, args):
         rtypes, rrows = query.run_query(entries, options_map, postings_query, '', numberify=True)
 
         if len(rrows) != 0:
-            date = rrows[len(rrows)-1][0] # Get date of last posting
-            amount = abs(rrows[len(rrows)-1][3]) # get balance from last row
-            if amount == 0.0:
-                print('Warning: adding zero expense for account= {}'.format(account))
-
-            #print('adding expense: {}-{}'.format(account, amount))
-            br.addBudgetExpense(date, account, amount)
+            try:
+                date = rrows[len(rrows)-1][0] # Get date of last posting
+                amount = abs(rrows[len(rrows)-1][3]) # get balance from last row
+                if amount == 0.0:
+                    print('Warning: adding zero expense for account= {}'.format(account))
+            except Exception as e:
+                print('Exception caused by rrows value: \n  ', rrows[len(rrows)-1])
+            else:
+                #print('adding expense: {}-{}'.format(account, amount))
+                br.addBudgetExpense(date, account, amount)
         #else:
         #    print('Warning: No expenses found for account: {}'.format(account))
 
