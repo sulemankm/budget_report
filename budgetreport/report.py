@@ -85,7 +85,7 @@ class BudgetReport:
         print('\n')
         headings = ['Account', 'Budget', 'Expense', '(%)', 'Remaining', '(%)']
         budget_data = self.toList()
-        print(tabulate(budget_data, headings, numalign="right", floatfmt=".1f"))
+        print(tabulate(budget_data, headings, numalign="right", floatfmt=".2f"))
 
     # Collect Budget accounts
     def collectBudgets(self, entries, options_map, args):
