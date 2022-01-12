@@ -78,8 +78,7 @@ class BudgetReport:
 
     def printReport(self, args):
         print('Budget Report:\n  Period: \'{}\''.format(self.period.period))
-        if args.start_date:
-            print('  Start: {}, End: {}'.format(self.start_date, self.end_date))
+        print('  Start: {}, End: {}'.format(self.start_date, self.end_date))
         if args.tag:
             print('  Tag \'{}\''.format(args.tag))
         print('\n')
@@ -102,11 +101,11 @@ class BudgetReport:
         if args.tag:
             acct_query += " and '{}' in tags ".format(args.tag)
 
-        if args.start_date:
-            acct_query += " and date >= {} ".format(args.start_date)
+        if self.start_date:
+            acct_query += " and date >= {} ".format(self.start_date)
 
-        if args.end_date:
-            acct_query += " and date <= {} ".format(args.end_date)
+        if self.end_date:
+            acct_query += " and date <= {} ".format(self.end_date)
 
         rtypes, rrows = query.run_query(
             entries, options_map, acct_query, '', numberify=True)
@@ -126,7 +125,6 @@ def generateBudgetReport(entries, options_map, args):
     if args.period:
         br.setPeriod(args.period)
     if args.start_date:
-        #br.start_date = dt.fromisoformat(args.start_date).date()
         br.setPeriod(br.period.period, dt.fromisoformat(args.start_date).date())
     if args.end_date:
         br.end_date = dt.fromisoformat(args.end_date).date()
@@ -140,11 +138,12 @@ def generateBudgetReport(entries, options_map, args):
         if args.tag:
             postings_query += " and '{}' in tags ".format(br.tag)
 
-        if args.start_date:
-            postings_query += " and date >= {} ".format(args.start_date)#.strftime('%Y-%m-%d'))
+        if br.start_date:
+            postings_query += " and date >= {} ".format(br.start_date)#.strftime('%Y-%m-%d'))
 
-        if args.end_date:
-            postings_query += " and date <= {} ".format(args.end_date)#.strftime('%Y-%m-%d'))
+        if br.end_date:
+            postings_query += " and date <= {} ".format(br.end_date)#.strftime('%Y-%m-%d'))
+
         #print('query: ', postings_query)
         rtypes, rrows = query.run_query(entries, options_map, postings_query, '', numberify=True)
 
@@ -159,7 +158,5 @@ def generateBudgetReport(entries, options_map, args):
             else:
                 #print('adding expense: {}-{}'.format(account, amount))
                 br.addBudgetExpense(date, account, amount)
-        #else:
-        #    print('Warning: No expenses found for account: {}'.format(account))
 
     return br
