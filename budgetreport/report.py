@@ -13,7 +13,7 @@ class BudgetReport:
         self.total_expenses = 0.0
         self.tag = ''
         self.period = Period('month') # default period is month
-        self.start_date = self.period.getPeriodStart(dt.min)
+        self.start_date = self.period.getPeriodStart(dt.today())
         self.end_date = self.period.getPeriodEnd(dt.today())
 
     def _addBudget(self, date, account, period, budget):
@@ -122,6 +122,7 @@ def generateBudgetReport(entries, options_map, args):
     br = BudgetReport()
     if args.tag:
         br.tag = args.tag
+        br.start_date = dt.min.date() # Start from begining to include all entries within the tag
     if args.period:
         br.setPeriod(args.period)
     if args.start_date:
