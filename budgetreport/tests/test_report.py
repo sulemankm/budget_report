@@ -326,3 +326,50 @@ def testBiannualBudget(monkeypatch):
       assert br.getAccountBudget('Expenses:Groceries') == 6000.0
       assert br.getAccountBudget('Expenses:Education') == 2000.0
  
+def testLiabilitiesHandling(monkeypatch):
+    entries, errors, options_map = loader.load_string("""
+2001-01-01 open Assets:CashInHand
+2001-01-01 open Assets:CheckingAccount
+2001-01-01 open Expenses:Groceries
+2001-01-01 open Expenses:Education
+2001-01-01 open Liabilities:CreditCard
+
+2001-01-01 custom "budget" Expenses:Groceries "month"  12000.0 RS
+2001-01-01 custom "budget" Liabilities:CreditCard "month"  6000.0 RS
+2001-01-01 custom "budget" Expenses:Education "month"  2000.0 RS
+
+2021-01-02 * "Test Payee 2" "Groceries"
+    Expenses:Groceries                            900.0 RS
+    Assets:CashInHand
+
+2021-01-03 * "School" "Fees"
+    Expenses:Education                           2200.0 RS
+    Assets:CashInHand
+
+2021-01-03 * "Online Shopping" "Groceries"
+    Expenses:Groceries                           2500.0 RS
+    Liabilities:CreditCard
+
+2021-01-20 * "Bank" "Credit Card Payment"
+    Liabilities:CreditCard                       1000.0 RS
+    Assets:CheckingAccount
+    """)
+
+    with monkeypatch.context() as m:
+      m.setattr(sys, "argv", ["prog", '-s', '2021-01-01', "testfile.bean"])
+
+      parser = main.init_arg_parser()
+      test_args = parser.parse_args()
+
+      br = report.generateBudgetReport(entries, options_map, test_args)
+      assert br.total_budget == 20000.0
+      assert br.total_expenses == 4100.0
+      assert br.getTotalRemaining() == 15900.0
+
+      assert br.getAccountBudget('Expenses:Groceries') == 12000.0
+      assert br.getAccountBudget('Expenses:Education') == 2000.0
+      assert br.getAccountBudget('Liabilities:CreditCard') == 6000.0
+
+      assert br.getAccountExpense('Expenses:Groceries') == 900.0
+      assert br.getAccountExpense('Expenses:Education') == 2200.0
+      assert br.getAccountExpense('Liabilities:CreditCard') == 1000.0

@@ -29,7 +29,7 @@ class BudgetReport:
         self.total_budget += float(budget)
 
     def addBudget(self, budget):
-        print('addBudget: {}'.format(budget))
+        # print('addBudget: {}'.format(budget))
         self._addBudget(budget.date, budget.account, budget.period, budget.budget)
 
     def addBudgetExpense(self, date, account, expense):
@@ -86,6 +86,7 @@ class BudgetReport:
         budget_data = self.toList()
         print(tabulate(budget_data, headings, numalign="right", floatfmt=".2f"))
 
+
     # Collect Budget accounts
     def collectBudgets(self, entries, options_map, args):
         # Collect all budgets
@@ -133,9 +134,10 @@ def generateBudgetReport(entries, options_map, args):
 
     br.collectBudgets(entries, options_map, args)
 
-    # Get actual postings for all budget accounts
+    # ========================================================================================
+    # Get actual postings for all budgetted accounts
     for account in br.budgetItems: # budgets:
-        postings_query = "select date, account, position, balance AS amount WHERE account = '{}'".format(account)
+        postings_query = "select date, account, position, balance, number, other_accounts WHERE account = '{}' and not (findfirst('Liabilities', other_accounts) ~ 'Liabilities') and number >= 0.0 ".format(account)
         if args.tag:
             postings_query += " and '{}' in tags ".format(br.tag)
 
