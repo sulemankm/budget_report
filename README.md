@@ -100,7 +100,10 @@ It would generate output similar to that shown below:
     Budget Report:
       Period: 'month'
       Start: 2021-12-01, End: 2021-12-31
-  
+	Total Income: 150,000.00
+	Total Budget: 108,000.00
+	Budget Surplus/Deficit: 42,000.00
+
     Account                    Budget    Expense    (%)    Remaining    (%)
     -----------------------  --------  ---------  -----  -----------  -----
     Liabilities:CreditCard    10000.0     5000.0   50.0       5000.0   50.0

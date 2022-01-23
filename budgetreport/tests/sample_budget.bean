@@ -46,6 +46,10 @@ option "insert_pythonpath" "True"
 
 ;============================================================
 ; Test transactions
+2021-12-01 * "Employer" "Salary"
+  Assets:CashInHand                          150000.0 RS
+  Income:Salary
+
 2021-12-01 * "Market" "Grocery items"
   Expenses:Groceries                             800 RS
   Assets:CashInHand
