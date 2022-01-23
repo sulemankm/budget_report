@@ -1,5 +1,6 @@
 # report.py
 from datetime import datetime as dt
+import decimal
 import beancount
 from beancount.query import query
 from tabulate import tabulate
@@ -11,6 +12,7 @@ class BudgetReport:
         self.budgetItems = {} # An dict to store budget report items
         self.total_budget = 0.0
         self.total_expenses = 0.0
+        self.total_income = 0.0
         self.tag = ''
         self.period = Period('month') # default period is month
         self.start_date = self.period.getPeriodStart(dt.today())
@@ -77,11 +79,13 @@ class BudgetReport:
         return result
 
     def printReport(self, args):
-        print('Budget Report:\n  Period: \'{}\''.format(self.period.period))
-        print('  Start: {}, End: {}'.format(self.start_date, self.end_date))
+        print('Budget Report:\n  Period: \'{}\' ({} to {})'.format(self.period.period, self.start_date, self.end_date))
         if args.tag:
             print('  Tag \'{}\''.format(args.tag))
-        print('\n')
+        print('Total Income: {:,.2f}'.format(self.total_income))
+        print('Total Budget: {:,.2f}'.format(self.total_budget))
+        print('Budget Surplus/Deficit: {:,.2f}'.format(self.total_income - decimal.Decimal(self.total_budget)), '\n')
+
         headings = ['Account', 'Budget', 'Expense', '(%)', 'Remaining', '(%)']
         budget_data = self.toList()
         print(tabulate(budget_data, headings, numalign="right", floatfmt=".2f"))
@@ -161,5 +165,22 @@ def generateBudgetReport(entries, options_map, args):
             else:
                 #print('adding expense: {}-{}'.format(account, amount))
                 br.addBudgetExpense(date, account, amount)
+
+    # Get total income during the report period
+    income_query = "select date, account, position, balance where account ~ 'Income'"
+
+    if args.tag:
+        income_query += " and '{}' in tags ".format(br.tag)
+
+    if br.start_date:
+        income_query += " and date >= {} ".format(br.start_date)#.strftime('%Y-%m-%d'))
+
+    if br.end_date:
+        income_query += " and date <= {} ".format(br.end_date)#.strftime('%Y-%m-%d'))
+
+    rtypes, rrows = query.run_query(entries, options_map, income_query, '', numberify=True)
+    print(rrows)
+    if len(rrows) != 0:
+        br.total_income = abs(rrows[len(rrows)-1][3])
 
     return br

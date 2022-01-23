@@ -373,3 +373,29 @@ def testLiabilitiesHandling(monkeypatch):
       assert br.getAccountExpense('Expenses:Groceries') == 900.0
       assert br.getAccountExpense('Expenses:Education') == 2200.0
       assert br.getAccountExpense('Liabilities:CreditCard') == 1000.0
+
+def testTotalIncome(monkeypatch):
+    entries, errors, options_map = loader.load_string("""
+2001-01-01 open Income:Salary
+2001-01-01 open Income:Business
+2001-01-01 open Assets:BankAccount
+2001-01-01 open Assets:CashInHand
+
+2021-01-02 * "Employer" "Salary"
+    Assets:BankAccount                          150000.0 RS
+    Income:Salary
+
+2021-01-03 * "Misc" "Income from sales"
+    Assets:CashInHand                           200000.0 RS
+    Income:Business
+
+    """)
+
+    with monkeypatch.context() as m:
+      m.setattr(sys, "argv", ["prog", '-s', '2021-01-01', "testfile.bean"])
+
+      parser = main.init_arg_parser()
+      test_args = parser.parse_args()
+
+      br = report.generateBudgetReport(entries, options_map, test_args)
+      assert br.total_income == 350000.0
