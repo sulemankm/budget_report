@@ -98,8 +98,7 @@ After you have added the budget entries in your beancount file, you can generate
 It would generate output similar to that shown below:
 
     Budget Report:
-      Period: 'month'
-      Start: 2021-12-01, End: 2021-12-31
+      Period: 'month' (2021-12-01 to 2021-12-31)
 	Total Income: 150,000.00
 	Total Budget: 108,000.00
 	Budget Surplus/Deficit: 42,000.00
