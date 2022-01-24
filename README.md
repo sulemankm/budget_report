@@ -14,7 +14,12 @@ The simplest way to install and use `budget-report` is via pip:
 
 or  
 
-`pip install budget-report --user`, if you want to install for local user  
+`pip install budget-report --user`, if you want to install for local user
+
+or, if you'd prefer to clone this repo instead of installing from PyPI, issue the followng command inside the project folder.
+
+`pip install .`
+
 
 ## 3. How-To Use
 
