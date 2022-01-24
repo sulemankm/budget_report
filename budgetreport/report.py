@@ -179,7 +179,7 @@ def generateBudgetReport(entries, options_map, args):
         income_query += " and date <= {} ".format(br.end_date)#.strftime('%Y-%m-%d'))
 
     rtypes, rrows = query.run_query(entries, options_map, income_query, '', numberify=True)
-    print(rrows)
+    # print(rrows)
     if len(rrows) != 0:
         br.total_income = abs(rrows[len(rrows)-1][3])
 
