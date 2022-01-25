@@ -399,3 +399,28 @@ def testTotalIncome(monkeypatch):
 
       br = report.generateBudgetReport(entries, options_map, test_args)
       assert br.total_income == 350000.0
+
+def testBudgetEndDate(monkeypatch):
+    entries, errors, options_map = loader.load_string("""
+2001-01-01 open Expenses:Clothing
+2001-01-01 open Expenses:Education
+2001-01-01 open Expenses:Food
+2001-01-01 open Expenses:Travel
+
+2021-01-01 custom "budget" Expenses:Clothing "month"     1000.0 USD
+2021-01-01 custom "budget" Expenses:Education "month"    2000.0 USD
+2021-01-01 custom "budget" Expenses:Food "month"     1000.0 USD
+
+2021-02-01 custom "budget" Expenses:Travel "month"    2000.0 USD
+
+    """)
+
+    with monkeypatch.context() as m:
+      m.setattr(sys, "argv", ["prog", '-s', '2021-01-01', "testfile.bean"])
+
+      parser = main.init_arg_parser()
+      test_args = parser.parse_args()
+
+      br = report.generateBudgetReport(entries, options_map, test_args)
+      assert br.total_budget == 4000.0
+      assert br.getAccountBudget('Expenses:Travel') == 0.0

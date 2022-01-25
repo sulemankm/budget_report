@@ -44,10 +44,22 @@ class BudgetReport:
             self.budgetItems[account].expense += float(expense)
 
     def getAccountBudget(self, account):
-        return self.budgetItems[account].budget
+        ret = 0.0
+        try:
+            ret = self.budgetItems[account].budget
+        except Exception as e:
+            return 0.0
+        else:
+            return ret
 
     def getAccountExpense(self, account):
-        return self.budgetItems[account].expense
+        ret = 0.0
+        try:
+            ret = self.budgetItems[account].expense
+        except Exception as e:
+            return 0.0
+        else:
+            return ret
 
     def getTotalRemaining(self):
         return float(self.total_budget) - float(self.total_expenses)
@@ -95,7 +107,10 @@ class BudgetReport:
     def collectBudgets(self, entries, options_map, args):
         # Collect all budgets
         for entry in entries:
-            if isinstance(entry, beancount.core.data.Custom) and entry.type == 'budget' and entry.values[1].value == self.period.period:
+            if isinstance(entry, beancount.core.data.Custom) and \
+               entry.type == 'budget' and \
+               entry.date <= self.end_date and \
+               entry.values[1].value == self.period.period:
                 account = str(entry.values[0].value)
                 period = entry.values[1].value
                 budget = abs(entry.values[2].value.number)
