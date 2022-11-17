@@ -96,7 +96,7 @@ class BudgetReport:
             print('  Tag \'{}\''.format(args.tag))
         print('Total Income: {:,.2f}'.format(self.total_income))
         print('Total Budget: {:,.2f}'.format(self.total_budget))
-        print('Budget Surplus/Deficit: {:,.2f}'.format(self.total_income - decimal.Decimal(self.total_budget)), '\n')
+        print('Budget Surplus/Deficit: {:,.2f}'.format(decimal.Decimal(self.total_income) - decimal.Decimal(self.total_budget)), '\n')
 
         headings = ['Account', 'Budget', 'Expense', '(%)', 'Remaining', '(%)']
         budget_data = self.toList()
