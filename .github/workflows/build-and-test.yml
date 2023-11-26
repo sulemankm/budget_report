@@ -29,7 +29,6 @@ jobs:
         pip install flake8 pytest build
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         sudo -H python -m pip install beancount
-        sudo apt-get install python3-beancount
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
